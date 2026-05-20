@@ -1,0 +1,7 @@
+{
+  "customSyntax": "postcss-lit",
+  "rules": {
+    "property-no-unknown": true,
+    "no-empty-source": null
+  }
+}
