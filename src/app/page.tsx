@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { ProductService } from '@/services/product.service';
 import { Product } from '@/models/product.model';
-import { formatPrice } from '@/utils/currency.util';
+import { ProductList } from '@/components/products/ProductList';
 
 export default function HomePage() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -27,40 +27,40 @@ export default function HomePage() {
   }, []);
 
   return (
+    <>
     <div className="container mx-auto px-4 py-8">
-      <section className="mb-12 rounded-xl bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-accent)] p-8 text-white">
-        <h1 className="mb-4 text-4xl font-bold">Bienvenido a ShopWave Fusion</h1>
-        <p className="text-lg">Tu tienda online favorita con los mejores productos</p>
-        <Link href="/products" className="mt-4 inline-block rounded-md bg-white px-6 py-2 font-semibold text-[var(--color-primary)] hover:bg-gray-100">
-          Ver Productos
+      <section className="mb-12 overflow-hidden rounded-2xl border border-[var(--color-border)] bg-[radial-gradient(circle_at_top_left,var(--color-accent-dark),transparent_35%),linear-gradient(130deg,var(--color-primary),var(--color-primary-light))] p-8 text-white md:p-12">
+        <p className="mb-2 text-sm uppercase tracking-[0.22em] text-white/75">ShopWave Fusion</p>
+        <h1 className="mb-4 max-w-2xl text-4xl font-bold leading-tight md:text-5xl">Encuentra tu próximo producto favorito.</h1>
+        <p className="max-w-xl text-white/85">Explora el catálogo completo con filtros por precio, categoría y descuento para comprar más rápido.</p>
+        <Link
+          href="/products"
+          className="mt-6 inline-flex items-center justify-center rounded-md bg-[var(--color-accent)] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[var(--color-accent-light)]"
+        >
+          Ir al catálogo
         </Link>
       </section>
 
-      <h2 className="mb-6 text-2xl font-bold text-[var(--color-foreground)]">Productos Destacados</h2>
-      {isLoading ? (
-        <p className="text-center text-[var(--color-foreground-muted)]">Cargando productos...</p>
-      ) : error ? (
-        <p className="text-center text-[var(--color-error)]">{error}</p>
-      ) : products.length === 0 ? (
-        <p className="text-center text-[var(--color-foreground-muted)]">No hay productos disponibles</p>
-      ) : (
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-          {products.map((product) => (
-            <Link key={product.id} href={`/products/${product.id}`} className="group rounded-lg bg-[var(--color-surface)] p-4 shadow-md transition hover:bg-[var(--color-surface-hover)] border border-[var(--color-border)]">
-              <div className="aspect-square overflow-hidden rounded-md bg-[var(--color-background-alt)]">
-                <img src={product.imageUrl} alt={product.title} className="h-full w-full object-cover" />
-              </div>
-              <h3 className="mt-2 font-semibold text-[var(--color-foreground)]">{product.title}</h3>
-              <div className="mt-1 flex items-center gap-2">
-                <span className="font-bold text-[var(--color-accent)]">{formatPrice(product.discountedPrice)}</span>
-                {product.discountPersent > 0 && (
-                  <span className="text-sm text-[var(--color-foreground-muted)] line-through">{formatPrice(product.price)}</span>
-                )}
-              </div>
-            </Link>
-          ))}
-        </div>
-      )}
+      <div className="mb-6 flex items-center justify-between gap-4">
+        <h2 className="text-2xl font-bold text-[var(--color-foreground)]">Productos destacados</h2>
+        <Link href="/products" className="text-sm font-semibold text-[var(--color-accent)] hover:text-[var(--color-accent-light)]">
+          Ver todos
+        </Link>
+      </div>
+
+      <ProductList
+        products={products}
+        loading={isLoading}
+        error={error || null}
+        emptyMessage="No hay productos disponibles por el momento."
+      />
     </div>
+
+    <footer className="mt-8 border-t border-[var(--color-border)] bg-[var(--color-surface)]">
+      <div className="container mx-auto px-4 py-6 text-center text-sm text-[var(--color-foreground-muted)]">
+        © 2026 ShopWave Fusion. Todos los derechos reservados.
+      </div>
+    </footer>
+    </>
   );
 }
