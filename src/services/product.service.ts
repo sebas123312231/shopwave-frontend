@@ -1,5 +1,5 @@
 import { api } from './api.service';
-import { Product, Rating, Review } from '@/models/product.model';
+import { Product } from '@/models/product.model';
 import { Page } from '@/types/api-response.type';
 
 export interface ProductFilters {
@@ -13,16 +13,6 @@ export interface ProductFilters {
   stock?: boolean;
   pageNumber?: number;
   pageSize?: number;
-}
-
-interface CreateReviewPayload {
-  productId: number;
-  review: string;
-}
-
-interface CreateRatingPayload {
-  productId: number;
-  rating: number;
 }
 
 const toCsv = (values?: string[]): string | undefined => {
@@ -73,19 +63,10 @@ export const ProductService = {
     return api.get<Product[]>(`/products/products/search?q=${encodeURIComponent(query)}`, false);
   },
 
-  getProductReviews: async (productId: number): Promise<Review[]> => {
-    return api.get<Review[]>(`/reviews/product/${productId}`, false);
-  },
-
-  getProductRatings: async (productId: number): Promise<Rating[]> => {
-    return api.get<Rating[]>(`/ratings/product/${productId}`, false);
-  },
-
-  createReview: async (payload: CreateReviewPayload): Promise<Review> => {
-    return api.post<Review>('/reviews/create', payload, true);
-  },
-
-  createRating: async (payload: CreateRatingPayload): Promise<Rating> => {
-    return api.post<Rating>('/ratings/create', payload, true);
+  getByCategory: async (categoryName: string, page = 0, pageSize = 12): Promise<Page<Product>> => {
+    return api.get<Page<Product>>(
+      `/products/by-category?categoryName=${encodeURIComponent(categoryName)}&page=${page}&pageSize=${pageSize}`,
+      false,
+    );
   },
 };

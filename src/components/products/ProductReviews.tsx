@@ -2,7 +2,8 @@
 
 import { FormEvent, useMemo, useState } from 'react';
 import { Rating, Review } from '@/models/product.model';
-import { ProductService } from '@/services/product.service';
+import { ReviewService } from '@/services/review.service';
+import { RatingService } from '@/services/rating.service';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
@@ -38,7 +39,7 @@ export const ProductReviews = ({ productId, reviews, ratings, onRefresh }: Produ
 
     setLoading(true);
     try {
-      await ProductService.createReview({ productId, review: reviewText.trim() });
+      await ReviewService.create({ productId, review: reviewText.trim() });
       setReviewText('');
       await onRefresh();
     } catch (err) {
@@ -53,7 +54,7 @@ export const ProductReviews = ({ productId, reviews, ratings, onRefresh }: Produ
     setLoading(true);
 
     try {
-      await ProductService.createRating({ productId, rating: ratingValue });
+      await RatingService.create({ productId, rating: ratingValue });
       await onRefresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'No se pudo enviar la calificación.');

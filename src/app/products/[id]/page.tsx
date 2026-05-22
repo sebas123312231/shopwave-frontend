@@ -5,6 +5,8 @@ import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { Product, Rating, Review } from '@/models/product.model';
 import { ProductService } from '@/services/product.service';
+import { ReviewService } from '@/services/review.service';
+import { RatingService } from '@/services/rating.service';
 import { Spinner } from '@/components/ui/Spinner';
 import { ProductDetail } from '@/components/products/ProductDetail';
 import { ProductReviews } from '@/components/products/ProductReviews';
@@ -32,8 +34,8 @@ export default function ProductDetailPage() {
     try {
       const [productData, reviewsData, ratingsData] = await Promise.all([
         ProductService.getProduct(productId),
-        ProductService.getProductReviews(productId),
-        ProductService.getProductRatings(productId),
+        ReviewService.getByProduct(productId),
+        RatingService.getByProduct(productId),
       ]);
 
       setProduct(productData);

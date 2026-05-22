@@ -27,6 +27,7 @@ export default function HomePage() {
   }, []);
 
   return (
+    <>
     <div className="container mx-auto px-4 py-8">
       <section className="mb-12 overflow-hidden rounded-2xl border border-[var(--color-border)] bg-[radial-gradient(circle_at_top_left,var(--color-accent-dark),transparent_35%),linear-gradient(130deg,var(--color-primary),var(--color-primary-light))] p-8 text-white md:p-12">
         <p className="mb-2 text-sm uppercase tracking-[0.22em] text-white/75">ShopWave Fusion</p>
@@ -54,5 +55,12 @@ export default function HomePage() {
         emptyMessage="No hay productos disponibles por el momento."
       />
     </div>
+
+    <footer className="mt-8 border-t border-[var(--color-border)] bg-[var(--color-surface)]">
+      <div className="container mx-auto px-4 py-6 text-center text-sm text-[var(--color-foreground-muted)]">
+        © 2026 ShopWave Fusion. Todos los derechos reservados.
+      </div>
+    </footer>
+    </>
   );
 }
