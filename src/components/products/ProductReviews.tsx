@@ -1,6 +1,6 @@
 'use client';
 
-import { FormEvent, useMemo, useState } from 'react';
+import { FormEvent, useState } from 'react';
 import { Rating, Review } from '@/models/product.model';
 import { ReviewService } from '@/services/review.service';
 import { RatingService } from '@/services/rating.service';
@@ -12,54 +12,55 @@ interface ProductReviewsProps {
   productId: number;
   reviews: Review[];
   ratings: Rating[];
+  averageRating: number;
   onRefresh: () => Promise<void>;
 }
 
-export const ProductReviews = ({ productId, reviews, ratings, onRefresh }: ProductReviewsProps) => {
+export const ProductReviews = ({ productId, reviews, ratings, averageRating, onRefresh }: ProductReviewsProps) => {
   const { isAuthenticated } = useAuth();
   const [reviewText, setReviewText] = useState('');
   const [ratingValue, setRatingValue] = useState(5);
-  const [loading, setLoading] = useState(false);
+  const [reviewLoading, setReviewLoading] = useState(false);
+  const [ratingLoading, setRatingLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  const averageRating = useMemo(() => {
-    if (ratings.length === 0) return 0;
-    const total = ratings.reduce((accumulator, item) => accumulator + item.rating, 0);
-    return total / ratings.length;
-  }, [ratings]);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   const handleSubmitReview = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setError(null);
+    setSuccessMessage(null);
 
     if (!reviewText.trim()) {
       setError('La reseña no puede estar vacía.');
       return;
     }
 
-    setLoading(true);
+    setReviewLoading(true);
     try {
       await ReviewService.create({ productId, review: reviewText.trim() });
       setReviewText('');
+      setSuccessMessage('Reseña publicada con éxito.');
       await onRefresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'No se pudo enviar la reseña.');
     } finally {
-      setLoading(false);
+      setReviewLoading(false);
     }
   };
 
   const handleSubmitRating = async () => {
     setError(null);
-    setLoading(true);
+    setSuccessMessage(null);
 
+    setRatingLoading(true);
     try {
       await RatingService.create({ productId, rating: ratingValue });
+      setSuccessMessage('Calificación enviada con éxito.');
       await onRefresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'No se pudo enviar la calificación.');
     } finally {
-      setLoading(false);
+      setRatingLoading(false);
     }
   };
 
@@ -83,7 +84,7 @@ export const ProductReviews = ({ productId, reviews, ratings, onRefresh }: Produ
               onChange={(event) => setReviewText(event.target.value)}
               placeholder="¿Qué te pareció este producto?"
             />
-            <Button type="submit" loading={loading}>
+            <Button type="submit" loading={reviewLoading}>
               Publicar reseña
             </Button>
           </form>
@@ -100,7 +101,7 @@ export const ProductReviews = ({ productId, reviews, ratings, onRefresh }: Produ
               className="w-full"
             />
             <p className="text-sm text-[var(--color-foreground-muted)]">{ratingValue} / 5</p>
-            <Button onClick={handleSubmitRating} loading={loading}>
+            <Button onClick={handleSubmitRating} loading={ratingLoading}>
               Enviar calificación
             </Button>
           </div>
@@ -108,6 +109,12 @@ export const ProductReviews = ({ productId, reviews, ratings, onRefresh }: Produ
       ) : (
         <p className="rounded-md bg-[var(--color-background-alt)] p-3 text-sm text-[var(--color-foreground-muted)]">
           Inicia sesión para publicar una reseña o calificación.
+        </p>
+      )}
+
+      {successMessage && (
+        <p className="rounded-md bg-[color-mix(in_srgb,var(--color-success)_12%,transparent)] p-3 text-sm text-[var(--color-success)]">
+          {successMessage}
         </p>
       )}
 

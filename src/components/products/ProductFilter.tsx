@@ -6,6 +6,7 @@ import { Select } from '@/components/ui/Select';
 interface ProductFilterProps {
   filters: ProductFilters;
   searchTerm: string;
+  isSearchActive?: boolean;
   onSearchChange: (value: string) => void;
   onFiltersChange: (filters: Partial<ProductFilters>) => void;
   onReset: () => void;
@@ -25,6 +26,7 @@ const stockOptions = [
 export const ProductFilter = ({
   filters,
   searchTerm,
+  isSearchActive = false,
   onSearchChange,
   onFiltersChange,
   onReset,
@@ -40,11 +42,18 @@ export const ProductFilter = ({
         onChange={(event) => onSearchChange(event.target.value)}
       />
 
+      {isSearchActive && (
+        <p className="rounded-md bg-[color-mix(in_srgb,var(--color-warning)_10%,transparent)] px-2.5 py-2 text-xs text-[var(--color-warning)]">
+          Los filtros están desactivados mientras hay una búsqueda activa.
+        </p>
+      )}
+
       <Input
         label="Categoría"
         placeholder="Ej. shoes"
         value={filters.category ?? ''}
         onChange={(event) => onFiltersChange({ category: event.target.value })}
+        disabled={isSearchActive}
       />
 
       <div className="grid grid-cols-2 gap-3">
@@ -57,6 +66,7 @@ export const ProductFilter = ({
             const value = event.target.value;
             onFiltersChange({ minPrice: value ? Number(value) : undefined });
           }}
+          disabled={isSearchActive}
         />
         <Input
           label="Precio máx"
@@ -67,6 +77,7 @@ export const ProductFilter = ({
             const value = event.target.value;
             onFiltersChange({ maxPrice: value ? Number(value) : undefined });
           }}
+          disabled={isSearchActive}
         />
       </div>
 
@@ -80,6 +91,7 @@ export const ProductFilter = ({
           const value = event.target.value;
           onFiltersChange({ minDiscount: value ? Number(value) : 0 });
         }}
+        disabled={isSearchActive}
       />
 
       <Select
@@ -88,6 +100,7 @@ export const ProductFilter = ({
         placeholder="Sin orden"
         value={filters.sort ?? ''}
         onChange={(event) => onFiltersChange({ sort: event.target.value || undefined })}
+        disabled={isSearchActive}
       />
 
       <Select
@@ -98,6 +111,37 @@ export const ProductFilter = ({
           const value = event.target.value;
           onFiltersChange({ stock: value ? value === 'true' : undefined });
         }}
+        disabled={isSearchActive}
+      />
+
+      <Input
+        label="Colores (separados por coma)"
+        placeholder="Ej. negro, blanco, rojo"
+        value={(filters.colors ?? []).join(', ')}
+        onChange={(event) => {
+          const raw = event.target.value;
+          const colors = raw
+            .split(',')
+            .map((c) => c.trim())
+            .filter((c) => c.length > 0);
+          onFiltersChange({ colors: colors.length > 0 ? colors : undefined });
+        }}
+        disabled={isSearchActive}
+      />
+
+      <Input
+        label="Tallas (separadas por coma)"
+        placeholder="Ej. S, M, L, XL"
+        value={(filters.sizes ?? []).join(', ')}
+        onChange={(event) => {
+          const raw = event.target.value;
+          const sizes = raw
+            .split(',')
+            .map((s) => s.trim())
+            .filter((s) => s.length > 0);
+          onFiltersChange({ sizes: sizes.length > 0 ? sizes : undefined });
+        }}
+        disabled={isSearchActive}
       />
 
       <Button variant="secondary" className="w-full" onClick={onReset}>

@@ -10,6 +10,7 @@ export default function ProductsPage() {
     productsPage,
     filters,
     searchTerm,
+    isSearchActive,
     loading,
     error,
     setSearchTerm,
@@ -38,6 +39,7 @@ export default function ProductsPage() {
         <ProductFilter
           filters={filters}
           searchTerm={searchTerm}
+          isSearchActive={isSearchActive}
           onSearchChange={setSearchTerm}
           onFiltersChange={updateFilters}
           onReset={resetFilters}

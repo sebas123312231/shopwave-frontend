@@ -50,7 +50,6 @@ export default function ProductDetailPage() {
   }, [productId]);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     loadProductData();
   }, [loadProductData]);
 
@@ -79,7 +78,7 @@ export default function ProductDetailPage() {
       ) : (
         <div className="space-y-8">
           <ProductDetail product={product} averageRating={averageRating} ratingsCount={ratings.length} />
-          <ProductReviews productId={product.id} reviews={reviews} ratings={ratings} onRefresh={loadProductData} />
+          <ProductReviews productId={product.id} reviews={reviews} ratings={ratings} averageRating={averageRating} onRefresh={loadProductData} />
         </div>
       )}
     </div>

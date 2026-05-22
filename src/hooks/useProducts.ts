@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Product } from '@/models/product.model';
 import { ProductFilters, ProductService } from '@/services/product.service';
 import { Page } from '@/types/api-response.type';
@@ -8,6 +8,8 @@ import { Page } from '@/types/api-response.type';
 interface UseProductsOptions {
   initialFilters?: ProductFilters;
 }
+
+const DEBOUNCE_MS = 400;
 
 const defaultFilters: ProductFilters = {
   category: '',
@@ -39,9 +41,22 @@ const paginateLocalResults = (products: Product[], pageNumber: number, pageSize:
 export const useProducts = ({ initialFilters }: UseProductsOptions = {}) => {
   const [filters, setFilters] = useState<ProductFilters>({ ...defaultFilters, ...initialFilters });
   const [searchTerm, setSearchTerm] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
   const [data, setData] = useState<Page<Product> | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    if (timerRef.current) clearTimeout(timerRef.current);
+    timerRef.current = setTimeout(() => {
+      setDebouncedSearch(searchTerm.trim());
+    }, DEBOUNCE_MS);
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current);
+    };
+  }, [searchTerm]);
 
   const serializedFilters = useMemo(() => JSON.stringify(filters), [filters]);
 
@@ -50,8 +65,8 @@ export const useProducts = ({ initialFilters }: UseProductsOptions = {}) => {
     setError(null);
 
     try {
-      if (searchTerm.trim()) {
-        const results = await ProductService.searchProducts(searchTerm.trim());
+      if (debouncedSearch) {
+        const results = await ProductService.searchProducts(debouncedSearch);
         setData(paginateLocalResults(results, filters.pageNumber ?? 0, filters.pageSize ?? 12));
       } else {
         const response = await ProductService.getFilteredProducts(filters);
@@ -63,12 +78,11 @@ export const useProducts = ({ initialFilters }: UseProductsOptions = {}) => {
     } finally {
       setLoading(false);
     }
-  }, [filters, searchTerm]);
+  }, [filters, debouncedSearch]);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchProducts();
-  }, [fetchProducts, serializedFilters, searchTerm]);
+  }, [fetchProducts, serializedFilters, debouncedSearch]);
 
   const updateFilters = (partial: Partial<ProductFilters>) => {
     setFilters((previous) => ({ ...previous, ...partial, pageNumber: partial.pageNumber ?? 0 }));
@@ -87,6 +101,7 @@ export const useProducts = ({ initialFilters }: UseProductsOptions = {}) => {
     productsPage: data,
     filters,
     searchTerm,
+    isSearchActive: debouncedSearch.length > 0,
     loading,
     error,
     setSearchTerm,
