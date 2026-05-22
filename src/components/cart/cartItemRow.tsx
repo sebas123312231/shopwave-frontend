@@ -39,55 +39,59 @@ export const CartItemRow: React.FC<CartItemRowProps> = ({ item }) => {
   };
 
   return (
-    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between border-b border-gray-200 py-4 gap-4">
+    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between border-b border-[var(--color-border)] py-4 gap-4">
       <div className="flex items-center gap-4 w-full sm:w-auto">
         <img
           src={item.product.imageUrl || '/placeholder-product.png'}
           alt={item.product.title}
-          className="w-20 h-24 object-cover rounded bg-gray-100 flex-shrink-0"
+          className="w-20 h-24 object-cover rounded bg-[var(--color-surface)] flex-shrink-0 border border-[var(--color-border)]"
         />
         <div className="flex-1 min-w-0">
-          <h3 className="font-semibold text-gray-900 truncate">{item.product.title}</h3>
-          <p className="text-sm text-gray-500 mt-0.5">Marca: {item.product.brand}</p>
-          <p className="text-sm text-gray-600 mt-1">
-            Talla: <span className="font-medium bg-gray-100 px-2 py-0.5 rounded text-xs">{item.size}</span>
+          <h3 className="font-semibold text-[var(--color-foreground)] truncate">{item.product.title}</h3>
+          <p className="text-sm text-[var(--color-foreground-muted)] mt-0.5">Marca: {item.product.brand}</p>
+          <p className="text-sm text-[var(--color-foreground-muted)] mt-1">
+            Talla: <span className="font-medium bg-[var(--color-surface-hover)] px-2 py-0.5 rounded text-xs text-[var(--color-foreground)]">{item.size}</span>
           </p>
           <div className="flex items-baseline gap-2 mt-2 sm:hidden">
-            <span className="font-bold text-gray-900">${item.discountedPrice}</span>
+            <span className="font-bold text-[var(--color-foreground)]">${item.discountedPrice}</span>
             {item.price > item.discountedPrice && (
-              <span className="text-xs text-gray-400 line-through">${item.price}</span>
+              <span className="text-xs text-[var(--color-foreground-muted)] line-through">${item.price}</span>
             )}
           </div>
         </div>
       </div>
 
       <div className="flex items-center justify-between sm:justify-end w-full sm:w-auto gap-8">
-        <div className="flex items-center border border-gray-300 rounded bg-white">
-          <button
+        <div className="flex items-center border border-[var(--color-border)] rounded bg-[var(--color-surface)]">
+          <Button
             type="button"
+            variant="ghost"
+            size="sm"
             disabled={item.quantity <= 1 || updating}
             onClick={() => handleQuantityChange(item.quantity - 1)}
-            className="px-3 py-1 text-gray-600 hover:bg-gray-100 transition disabled:opacity-30"
+            className="px-2 py-1 min-w-[2rem]"
           >
             -
-          </button>
-          <span className="px-3 py-1 font-medium text-gray-800 text-sm min-w-[2.5rem] text-center">
+          </Button>
+          <span className="px-2 py-1 font-medium text-[var(--color-foreground)] text-sm min-w-[2rem] text-center">
             {item.quantity}
           </span>
-          <button
+          <Button
             type="button"
+            variant="ghost"
+            size="sm"
             disabled={updating}
             onClick={() => handleQuantityChange(item.quantity + 1)}
-            className="px-3 py-1 text-gray-600 hover:bg-gray-100 transition disabled:opacity-30"
+            className="px-2 py-1 min-w-[2rem]"
           >
             +
-          </button>
+          </Button>
         </div>
 
         <div className="hidden sm:flex flex-col items-end min-w-[5rem]">
-          <span className="font-bold text-gray-900">${(item.discountedPrice * item.quantity)}</span>
+          <span className="font-bold text-[var(--color-foreground)]">${(item.discountedPrice * item.quantity)}</span>
           {item.price > item.discountedPrice && (
-            <span className="text-xs text-gray-400 line-through">${(item.price * item.quantity)}</span>
+            <span className="text-xs text-[var(--color-foreground-muted)] line-through">${(item.price * item.quantity)}</span>
           )}
         </div>
 
@@ -96,7 +100,6 @@ export const CartItemRow: React.FC<CartItemRowProps> = ({ item }) => {
           size="sm"
           disabled={updating}
           onClick={handleRemove}
-          className="text-xs py-1.5 px-3"
         >
           Eliminar
         </Button>
