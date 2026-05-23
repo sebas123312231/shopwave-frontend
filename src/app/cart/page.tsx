@@ -6,6 +6,7 @@ import { CartItemRow } from '@/components/cart/CartItemRow';
 import { CartSummary } from '@/components/cart/CartSummary';
 import { EmptyCart } from '@/components/cart/EmptyCart';
 import { Spinner } from '@/components/ui/Spinner';
+import { AuthGuard } from '@/guards/AuthGuard';
 
 export default function CartPage() {
   const { cart, loading, error } = useCart();
@@ -33,6 +34,7 @@ export default function CartPage() {
   const hasItems = cart && cart.cartItems && cart.cartItems.length > 0;
 
   return (
+      <AuthGuard>
     <div className="max-w-6xl mx-auto px-4 py-8 md:py-12">
       <h1 className="text-2xl font-extrabold text-[var(--color-foreground)] tracking-tight mb-8">
         Tu Carrito de Compras
@@ -62,5 +64,6 @@ export default function CartPage() {
         </div>
       )}
     </div>
+      </AuthGuard>
   );
 }

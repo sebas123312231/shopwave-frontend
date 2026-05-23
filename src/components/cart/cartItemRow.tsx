@@ -39,8 +39,9 @@ export const CartItemRow: React.FC<CartItemRowProps> = ({ item }) => {
   };
 
   return (
-    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between border-b border-[var(--color-border)] py-4 gap-4">
-      <div className="flex items-center gap-4 w-full sm:w-auto">
+    <div className="flex flex-col sm:grid sm:grid-cols-12 items-start sm:items-center justify-between border-b border-[var(--color-border)] py-4 gap-4">
+      {/* Detalle Producto (Columna 6) */}
+      <div className="flex items-center gap-4 w-full sm:col-span-6 min-w-0">
         <img
           src={item.product.imageUrl || '/placeholder-product.png'}
           alt={item.product.title}
@@ -52,16 +53,20 @@ export const CartItemRow: React.FC<CartItemRowProps> = ({ item }) => {
           <p className="text-sm text-[var(--color-foreground-muted)] mt-1">
             Talla: <span className="font-medium bg-[var(--color-surface-hover)] px-2 py-0.5 rounded text-xs text-[var(--color-foreground)]">{item.size}</span>
           </p>
-          <div className="flex items-baseline gap-2 mt-2 sm:hidden">
-            <span className="font-bold text-[var(--color-foreground)]">${item.discountedPrice}</span>
-            {item.price > item.discountedPrice && (
-              <span className="text-xs text-[var(--color-foreground-muted)] line-through">${item.price}</span>
-            )}
+          {/* Vista móvil del precio */}
+          <div className="flex flex-col mt-1 sm:hidden">
+            <span className="text-xs text-[var(--color-foreground-muted)]">
+              Precio Unit: ${item.discountedPrice}
+            </span>
+            <span className="font-bold text-[var(--color-foreground)] mt-0.5">
+              Subtotal: ${(item.discountedPrice * item.quantity)}
+            </span>
           </div>
         </div>
       </div>
 
-      <div className="flex items-center justify-between sm:justify-end w-full sm:w-auto gap-8">
+      {/* Selector de Cantidad (Columna 3) */}
+      <div className="flex items-center justify-center w-full sm:w-auto sm:col-span-3">
         <div className="flex items-center border border-[var(--color-border)] rounded bg-[var(--color-surface)]">
           <Button
             type="button"
@@ -87,19 +92,27 @@ export const CartItemRow: React.FC<CartItemRowProps> = ({ item }) => {
             +
           </Button>
         </div>
+      </div>
 
-        <div className="hidden sm:flex flex-col items-end min-w-[5rem]">
-          <span className="font-bold text-[var(--color-foreground)]">${(item.discountedPrice * item.quantity)}</span>
-          {item.price > item.discountedPrice && (
-            <span className="text-xs text-[var(--color-foreground-muted)] line-through">${(item.price * item.quantity)}</span>
-          )}
-        </div>
+      {/* Precio Unitario y Subtotal en Desktop (Columna 2) */}
+      <div className="hidden sm:flex flex-col items-end sm:col-span-2 pr-2">
+        <span className="font-bold text-[var(--color-foreground)]">
+          ${(item.discountedPrice * item.quantity)}
+        </span>
+        <span className="text-xs text-[var(--color-foreground-muted)] mt-0.5">
+          ({item.quantity} x ${item.discountedPrice})
+        </span>
+      </div>
 
+      {/* Botón Eliminar (Columna 1) */}
+      <div className="flex justify-end w-full sm:w-auto sm:col-span-1">
         <Button
+          type="button"
           variant="danger"
           size="sm"
           disabled={updating}
           onClick={handleRemove}
+          className="w-full sm:w-auto text-center"
         >
           Eliminar
         </Button>

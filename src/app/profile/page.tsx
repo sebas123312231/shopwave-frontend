@@ -5,6 +5,7 @@ import { UserService } from '@/services/user.service';
 import { User } from '@/models/user.model';
 import { Spinner } from '@/components/ui/Spinner';
 import { Badge } from '@/components/ui/Badge';
+import { AuthGuard } from '@/guards/AuthGuard';
 
 export default function ProfilePage() {
   const [profile, setProfile] = useState<User | null>(null);
@@ -47,6 +48,7 @@ export default function ProfilePage() {
   }
 
   return (
+    <AuthGuard>
     <div className="max-w-4xl mx-auto px-4 py-8 md:py-12">
       <div className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-lg shadow-sm overflow-hidden">
         
@@ -111,5 +113,6 @@ export default function ProfilePage() {
         </div>
       </div>
     </div>
+    </AuthGuard>
   );
 }

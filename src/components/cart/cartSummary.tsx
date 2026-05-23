@@ -26,15 +26,16 @@ export const CartSummary: React.FC<CartSummaryProps> = ({ cart, showCheckoutButt
         </div>
 
         {cart.discounte > 0 && (
-          <div className="flex justify-between text-[var(--color-success)] font-medium">
-            <span>Descuento Aplicado</span>
+          <div className="flex justify-between text-[var(--color-error)] font-medium">
+            {/* Cambiado semánticamente para cumplir con el requerimiento de "ahorro" */}
+            <span>Tu Ahorro Total</span>
             <span>-${cart.discounte}</span>
           </div>
         )}
 
         <div className="flex justify-between text-sm">
           <span>Envío</span>
-          <span className="text-[var(--color-success)] font-medium">Gratis</span>
+          <span className="text-[var(--color-primary-light)] font-medium">Gratis</span>
         </div>
 
         <div className="border-t border-[var(--color-border)] pt-4 mt-2 flex justify-between text-base font-bold text-[var(--color-foreground)]">
@@ -45,6 +46,7 @@ export const CartSummary: React.FC<CartSummaryProps> = ({ cart, showCheckoutButt
 
       {showCheckoutButton && (
         <Button
+          type="button"
           variant="primary"
           size="lg"
           className="w-full mt-6"
