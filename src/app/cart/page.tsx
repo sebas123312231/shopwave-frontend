@@ -2,8 +2,8 @@
 
 import React from 'react';
 import { useCart } from '@/hooks/useCart';
-import { CartItemRow } from '@/components/cart/cartItemRow';
-import { CartSummary } from '@/components/cart/cartSummary';
+import { CartItemRow } from '@/components/cart/CartItemRow';
+import { CartSummary } from '@/components/cart/CartSummary';
 import { EmptyCart } from '@/components/cart/EmptyCart';
 import { Spinner } from '@/components/ui/Spinner';
 

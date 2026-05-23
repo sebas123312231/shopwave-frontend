@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useCart } from '@/hooks/useCart';
 import { OrderService } from '@/services/order.service';
 import { CreateOrderRequest, PaymentMethod, PaymentStatus } from '@/models/order.model';
-import { CartSummary } from '@/components/cart/cartSummary';
+import { CartSummary } from '@/components/cart/CartSummary';
 import { Input } from '@/components/ui/Input';
 import { Select } from '@/components/ui/Select';
 import { Button } from '@/components/ui/Button';
