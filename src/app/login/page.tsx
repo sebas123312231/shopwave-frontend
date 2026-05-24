@@ -4,6 +4,9 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { AuthService } from '@/services/auth.service';
+import { Input } from '@/components/ui/Input';
+import { Button } from '@/components/ui/Button';
+import { LogIn, Package } from 'lucide-react';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -28,42 +31,85 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-[80vh] items-center justify-center">
-      <div className="w-full max-w-md rounded-lg bg-[var(--color-surface)] p-8 shadow-md border border-[var(--color-border)]">
-        <h1 className="mb-6 text-2xl font-bold text-center text-[var(--color-foreground)]">Iniciar Sesión</h1>
-        {error && <p className="mb-4 text-sm text-[var(--color-error)]">{error}</p>}
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-[var(--color-foreground)]">Correo electrónico</label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="mt-1 w-full rounded-md border border-[var(--color-border)] bg-[var(--color-background-alt)] p-2 text-[var(--color-foreground)]"
-              required
-            />
+    <div className="flex min-h-[90vh]">
+      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-primary via-primary-light to-primary items-center justify-center p-12">
+        <div className="max-w-md text-center space-y-6 animate-slideInLeft">
+          <div className="flex justify-center">
+            <div className="h-20 w-20 rounded-2xl bg-accent/20 flex items-center justify-center">
+              <Package size={40} className="text-accent-light" />
+            </div>
           </div>
-          <div>
-            <label className="block text-sm font-medium text-[var(--color-foreground)]">Contraseña</label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="mt-1 w-full rounded-md border border-[var(--color-border)] bg-[var(--color-background-alt)] p-2 text-[var(--color-foreground)]"
-              required
-            />
+          <h2 className="text-3xl font-bold text-white">Bienvenido a ShopWave</h2>
+          <p className="text-white/70">
+            Accede a tu cuenta para gestionar tus pedidos, carrito de compras y más.
+          </p>
+          <div className="flex justify-center gap-4 text-sm text-white/50">
+            <span className="flex items-center gap-1">
+              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+              </svg>
+              Gestión de pedidos
+            </span>
+            <span className="flex items-center gap-1">
+              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+              </svg>
+              Carrito persistente
+            </span>
           </div>
-          <button
-            type="submit"
-            disabled={isLoading}
-            className="w-full rounded-md bg-[var(--color-accent)] py-2 font-semibold text-white hover:bg-[var(--color-accent-light)] disabled:opacity-50"
-          >
-            {isLoading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
-          </button>
-        </form>
-        <p className="mt-4 text-center text-sm text-[var(--color-foreground-muted)]">
-          ¿No tienes cuenta? <Link href="/register" className="text-[var(--color-accent)] hover:underline">Regístrate</Link>
-        </p>
+        </div>
+      </div>
+
+      <div className="flex-1 flex items-center justify-center p-6 md:p-12">
+        <div className="w-full max-w-md animate-slideUp">
+          <div className="bg-white rounded-2xl shadow-xl border border-border p-8 md:p-10">
+            <div className="mb-8 text-center">
+              <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2">Iniciar Sesión</h1>
+              <p className="text-foreground-muted text-sm">Accede a tu cuenta ShopWave</p>
+            </div>
+
+            {error && (
+              <div className="mb-6 rounded-xl bg-red-50 border border-red-200 p-4 flex items-center gap-3">
+                <svg className="w-5 h-5 text-error flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <p className="text-sm text-red-700">{error}</p>
+              </div>
+            )}
+
+            <form onSubmit={handleSubmit} className="space-y-5">
+              <Input
+                label="Correo electrónico"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="tu@email.com"
+                required
+              />
+
+              <Input
+                label="Contraseña"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="••••••••"
+                required
+              />
+
+              <Button type="submit" size="lg" className="w-full" loading={isLoading}>
+                <LogIn size={18} />
+                Iniciar Sesión
+              </Button>
+            </form>
+
+            <p className="mt-6 text-center text-sm text-foreground-muted">
+              ¿No tienes cuenta?{' '}
+              <Link href="/register" className="font-semibold text-accent hover:text-accent-dark hover:underline">
+                Regístrate aquí
+              </Link>
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   );
