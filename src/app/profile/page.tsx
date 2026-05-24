@@ -7,6 +7,7 @@ import { Spinner } from '@/components/ui/Spinner';
 import { Badge } from '@/components/ui/Badge';
 import { AuthGuard } from '@/guards/AuthGuard';
 
+
 export default function ProfilePage() {
   const [profile, setProfile] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
@@ -34,6 +35,7 @@ export default function ProfilePage() {
         <p className="text-xs text-[var(--color-foreground-muted)]">Cargando perfil de usuario...</p>
       </div>
     );
+
   }
 
   if (error || !profile) {
