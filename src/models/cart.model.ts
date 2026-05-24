@@ -18,3 +18,15 @@ export interface Cart {
   discounte: number;
   cartItems: CartItem[];
 }
+
+export interface AddItemRequest {
+  productId: number;
+  size: string;
+  quantity: number;
+  price: number;
+}
+
+export interface UpdateCartItemRequest {
+  quantity: number;
+  size: string;
+}

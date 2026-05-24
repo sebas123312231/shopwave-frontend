@@ -1,67 +1,120 @@
 'use client';
 
-import { User, Mail, Phone, Shield, LogOut } from 'lucide-react';
-import { Button } from '@/components/ui/Button';
+import React, { useEffect, useState } from 'react';
+import { UserService } from '@/services/user.service';
+import { User } from '@/models/user.model';
+import { Spinner } from '@/components/ui/Spinner';
+import { Badge } from '@/components/ui/Badge';
+import { AuthGuard } from '@/guards/AuthGuard';
 
-const mockUser = {
-  firstName: 'Juan',
-  lastName: 'Pérez',
-  email: 'juan.perez@email.com',
-  mobile: '+54 11 1234 5678',
-  role: 'USER',
-};
-
-const ProfileCard = ({ label, value, icon: Icon }: { label: string; value: string; icon: React.ReactNode }) => (
-  <div className="flex items-center gap-4 py-4 border-b border-border last:border-0">
-    <div className="h-10 w-10 rounded-xl bg-accent/10 text-accent flex items-center justify-center flex-shrink-0">
-      {Icon}
-    </div>
-    <div className="flex-1">
-      <p className="text-xs font-medium text-foreground-muted uppercase tracking-wider">{label}</p>
-      <p className="text-base font-medium text-foreground">{value}</p>
-    </div>
-  </div>
-);
 
 export default function ProfilePage() {
-  return (
-    <div className="max-w-2xl mx-auto">
-      <h1 className="text-3xl font-bold text-foreground mb-8">Mi Perfil</h1>
+  const [profile, setProfile] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-      <div className="rounded-2xl bg-white border border-border shadow-lg overflow-hidden animate-slideUp">
-        <div className="flex flex-col items-center py-8 px-6 bg-gradient-to-r from-primary to-primary-light">
-          <div className="h-20 w-20 rounded-full bg-accent/20 text-accent-light flex items-center justify-center text-2xl font-bold mb-4">
-            JP
-          </div>
-          <h2 className="text-xl font-bold text-white">
-            {mockUser.firstName} {mockUser.lastName}
-          </h2>
-          <div className="flex items-center gap-1.5 mt-2 text-white/70 text-sm">
-            <Shield size={14} />
-            <span>{mockUser.role === 'ADMIN' ? 'Administrador' : 'Usuario'}</span>
-          </div>
-        </div>
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      try {
+        const userData = await UserService.getProfile();
+        setProfile(userData);
+      } catch (err: unknown) {
+        setError(err instanceof Error ? err.message : 'Error al obtener los datos del perfil');
+      } finally {
+        setLoading(false);
+      }
+    };
 
-        <div className="p-6 md:p-8">
-          <ProfileCard label="Nombre completo" value={`${mockUser.firstName} ${mockUser.lastName}`} icon={<User size={20} />} />
-          <ProfileCard label="Correo electrónico" value={mockUser.email} icon={<Mail size={20} />} />
-          <ProfileCard label="Teléfono" value={mockUser.mobile} icon={<Phone size={20} />} />
-        </div>
+    fetchUserProfile();
+  }, []);
 
-        <div className="px-6 md:px-8 pb-6">
-          <Button variant="danger" className="w-full">
-            <LogOut size={18} />
-            Cerrar sesión
-          </Button>
+  if (loading) {
+    return (
+      <div className="min-h-[60vh] flex flex-col items-center justify-center gap-2">
+        <Spinner size="lg" />
+        <p className="text-xs text-[var(--color-foreground-muted)]">Cargando perfil de usuario...</p>
+      </div>
+    );
+
+  }
+
+  if (error || !profile) {
+    return (
+      <div className="max-w-4xl mx-auto px-4 py-12">
+        <div className="bg-[color-mix(in_srgb,var(--color-error)_10%,transparent)] border border-[var(--color-error)] text-[var(--color-error)] p-4 rounded-md text-sm shadow-xs">
+          <p className="font-semibold">No se pudo cargar el perfil</p>
+          <p className="mt-1 text-xs opacity-90">{error || 'Intente de nuevo más tarde.'}</p>
         </div>
       </div>
+    );
+  }
 
-      <div className="mt-6 rounded-2xl bg-surface-blue border border-border p-5">
-        <h3 className="font-semibold text-foreground mb-2">Información importante</h3>
-        <p className="text-sm text-foreground-muted">
-          Para actualizar tus datos personales o cambiar tu contraseña, contacta a nuestro equipo de soporte.
-        </p>
+  return (
+    <AuthGuard>
+    <div className="max-w-4xl mx-auto px-4 py-8 md:py-12">
+      <div className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-lg shadow-sm overflow-hidden">
+        
+        <div className="bg-[color-mix(in_srgb,var(--color-foreground)_90%,transparent)] px-6 py-8 text-[var(--color-background)] flex items-center gap-4">
+          <div className="w-16 h-16 bg-[var(--color-accent)] text-white rounded-full flex items-center justify-center text-2xl font-black uppercase shadow-inner">
+            {profile.firstName.slice(0, 1)}{profile.lastName.slice(0, 1)}
+          </div>
+          <div>
+            <h1 className="text-xl font-bold tracking-tight text-white">{profile.firstName} {profile.lastName}</h1>
+            <p className="text-sm text-[var(--color-foreground-muted)] mt-0.5">{profile.email}</p>
+          </div>
+        </div>
+
+        <div className="p-6 space-y-8">
+          <div>
+            <h2 className="text-sm font-semibold text-[var(--color-foreground-muted)] uppercase tracking-wider mb-3">
+              Información de la Cuenta
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-[var(--color-surface-hover)] p-4 rounded-md border border-[var(--color-border)] text-sm">
+              <div>
+                <span className="block text-xs text-[var(--color-foreground-muted)] font-medium">Nombre Completo</span>
+                <span className="font-semibold text-[var(--color-foreground)]">{profile.firstName} {profile.lastName}</span>
+              </div>
+              <div>
+                <span className="block text-xs text-[var(--color-foreground-muted)] font-medium">Correo Electrónico</span>
+                <span className="font-semibold text-[var(--color-foreground)]">{profile.email}</span>
+              </div>
+              <div>
+                <span className="block text-xs text-[var(--color-foreground-muted)] font-medium">Teléfono Móvil</span>
+                <span className="font-semibold text-[var(--color-foreground)]">{profile.mobile || 'No registrado'}</span>
+              </div>
+              <div>
+                <span className="block text-xs text-[var(--color-foreground-muted)] font-medium mb-1">Rol de Usuario</span>
+                <Badge variant={profile.role === 'ROLE_ADMIN' ? 'danger' : 'default'}>
+                  {profile.role === 'ROLE_ADMIN' ? 'Administrador' : 'Cliente'}
+                </Badge>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <h2 className="text-sm font-semibold text-[var(--color-foreground-muted)] uppercase tracking-wider mb-3">
+              Libreta de Direcciones Guardadas
+            </h2>
+            {!profile.addresses || profile.addresses.length === 0 ? (
+              <p className="text-sm text-[var(--color-foreground-muted)] bg-[var(--color-surface-hover)] p-4 rounded border border-dashed border-[var(--color-border)] text-center">
+                Aún no has guardado direcciones en tus compras.
+              </p>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {profile.addresses.map((address) => (
+                  <div key={address.id} className="border border-[var(--color-border)] rounded-lg p-4 relative shadow-2xs hover:border-[var(--color-accent)] transition bg-[var(--color-surface)] text-sm">
+                    <p className="font-semibold text-[var(--color-foreground)]">{address.firstName} {address.lastName}</p>
+                    <p className="text-[var(--color-foreground-muted)] mt-1">{address.streetAddress}</p>
+                    <p className="text-[var(--color-foreground-muted)]">{address.city}, {address.state} - {address.zipCode}</p>
+                    <p className="text-xs text-[var(--color-foreground-muted)] mt-2 font-medium">📞 {address.mobile}</p>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
       </div>
     </div>
+    </AuthGuard>
   );
 }

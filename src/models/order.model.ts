@@ -40,3 +40,18 @@ export interface Order {
   totalItem: number;
   createdAt: string;
 }
+
+export interface CreateOrderRequest {
+  firstName: string;
+  lastName: string;
+  streetAddress: string;
+  city: string;
+  state: string;
+  zipCode: string;
+  mobile: string;
+  paymentMethod: PaymentMethod;
+  status: PaymentStatus;
+  paymentId: string;
+  cardholderName: string;
+  cardNumber: string;
+}
