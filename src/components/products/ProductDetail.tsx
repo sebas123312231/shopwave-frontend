@@ -5,6 +5,7 @@ import { Product } from '@/models/product.model';
 import { formatPrice } from '@/utils/currency.util';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
+import { Star, ShoppingCart, Minus, Plus } from 'lucide-react';
 
 interface ProductDetailProps {
   product: Product;
@@ -22,20 +23,38 @@ export const ProductDetail = ({ product, averageRating, ratingsCount }: ProductD
   const [quantity, setQuantity] = useState(1);
 
   const handleAddToCart = () => {
-    // TODO: integrar con CartContext.addItem cuando el flujo de carrito del Equipo 2 este disponible.
     console.log('TODO add to cart', { productId: product.id, selectedSize, quantity });
   };
 
+  const renderStars = (rating: number) => {
+    return Array.from({ length: 5 }, (_, i) => (
+      <Star
+        key={i}
+        size={16}
+        className={i < Math.round(rating) ? 'fill-accent text-accent' : 'text-border'}
+      />
+    ));
+  };
+
   return (
-    <section className="grid gap-8 lg:grid-cols-2">
-      <div className="overflow-hidden rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)]">
+    <section className="grid gap-10 lg:grid-cols-[3fr_4fr]">
+      <div className="overflow-hidden rounded-2xl shadow-2xl border border-border bg-white">
         <img src={product.imageUrl} alt={product.title} className="h-full w-full object-cover" />
       </div>
 
-      <div className="space-y-5">
-        <div>
-          <p className="text-sm uppercase tracking-wider text-[var(--color-foreground-muted)]">{product.brand}</p>
-          <h1 className="mt-1 text-3xl font-bold leading-tight">{product.title}</h1>
+      <div className="space-y-6">
+        <div className="space-y-2">
+          <p className="text-sm uppercase tracking-wider text-accent font-medium">{product.brand}</p>
+          <h1 className="text-3xl md:text-4xl font-bold text-foreground leading-tight tracking-tight">{product.title}</h1>
+        </div>
+
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-1">
+            {renderStars(averageRating)}
+          </div>
+          <span className="text-sm text-foreground-muted">
+            {averageRating > 0 ? `${averageRating.toFixed(1)} / 5 (${ratingsCount} calificaciones)` : 'Sin calificaciones'}
+          </span>
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
@@ -43,33 +62,31 @@ export const ProductDetail = ({ product, averageRating, ratingsCount }: ProductD
           <Badge variant={product.quantity > 0 ? 'success' : 'warning'}>
             {product.quantity > 0 ? 'Disponible' : 'Sin stock'}
           </Badge>
-          {product.category?.name && <Badge>{product.category.name}</Badge>}
+          {product.category?.name && <Badge variant="default">{product.category.name}</Badge>}
         </div>
 
         <div className="flex items-baseline gap-3">
-          <span className="text-3xl font-bold text-[var(--color-accent)]">{formatPrice(product.discountedPrice)}</span>
+          <span className="text-3xl font-bold text-accent">{formatPrice(product.discountedPrice)}</span>
           {product.discountPersent > 0 && (
-            <span className="text-lg text-[var(--color-foreground-muted)] line-through">{formatPrice(product.price)}</span>
+            <span className="text-lg text-foreground-muted line-through">{formatPrice(product.price)}</span>
           )}
         </div>
 
-        <p className="text-sm text-[var(--color-foreground-muted)]">
-          {averageRating > 0
-            ? `Valoración promedio ${averageRating.toFixed(1)} / 5 (${ratingsCount} calificaciones)`
-            : 'Este producto aún no tiene calificaciones'}
-        </p>
-
-        <p className="leading-relaxed text-[var(--color-foreground)]">{product.description}</p>
+        <p className="leading-relaxed text-foreground-muted">{product.description}</p>
 
         {availableSizes.length > 0 && (
-          <div className="space-y-2">
-            <p className="text-sm font-semibold">Talla</p>
+          <div className="space-y-3">
+            <p className="text-sm font-semibold text-foreground">Talla</p>
             <div className="flex flex-wrap gap-2">
               {availableSizes.map((size) => (
                 <button
                   key={size}
-                  className={`rounded-md border px-3 py-1.5 text-sm transition ${selectedSize === size ? 'border-[var(--color-accent)] bg-[var(--color-accent)] text-white' : 'border-[var(--color-border)] bg-[var(--color-surface)]'}`}
                   onClick={() => setSelectedSize(size)}
+                  className={`rounded-xl border px-4 py-2.5 text-sm font-medium transition-all ${
+                    selectedSize === size
+                      ? 'border-accent bg-accent text-white shadow-md'
+                      : 'border-border bg-white text-foreground hover:border-accent hover:bg-accent/5'
+                  }`}
                 >
                   {size}
                 </button>
@@ -78,19 +95,32 @@ export const ProductDetail = ({ product, averageRating, ratingsCount }: ProductD
           </div>
         )}
 
-        <div className="max-w-28">
-          <label className="mb-1.5 block text-sm font-semibold">Cantidad</label>
-          <input
-            type="number"
-            min={1}
-            max={Math.max(1, product.quantity)}
-            value={quantity}
-            onChange={(event) => setQuantity(Math.max(1, Number(event.target.value) || 1))}
-            className="w-full rounded-md border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-sm"
-          />
+        <div className="flex items-center gap-4">
+          <div className="flex items-center rounded-xl border border-border bg-white">
+            <button
+              onClick={() => setQuantity(Math.max(1, quantity - 1))}
+              className="p-2.5 hover:bg-background-alt transition-colors rounded-l-xl"
+            >
+              <Minus size={16} />
+            </button>
+            <span className="w-12 text-center font-medium">{quantity}</span>
+            <button
+              onClick={() => setQuantity(Math.min(product.quantity, quantity + 1))}
+              className="p-2.5 hover:bg-background-alt transition-colors rounded-r-xl"
+            >
+              <Plus size={16} />
+            </button>
+          </div>
+          <span className="text-sm text-foreground-muted">Stock: {product.quantity}</span>
         </div>
 
-        <Button className="w-full sm:w-auto" onClick={handleAddToCart} disabled={product.quantity <= 0}>
+        <Button
+          size="lg"
+          className="w-full sm:w-auto"
+          onClick={handleAddToCart}
+          disabled={product.quantity <= 0}
+        >
+          <ShoppingCart size={20} />
           Agregar al carrito
         </Button>
       </div>
