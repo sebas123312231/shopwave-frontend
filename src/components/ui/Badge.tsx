@@ -7,10 +7,10 @@ interface BadgeProps {
 }
 
 const variantMap: Record<NonNullable<BadgeProps['variant']>, string> = {
-  default: 'bg-[var(--color-primary-light)] text-[var(--color-foreground)]',
-  success: 'bg-[color-mix(in_srgb,var(--color-success)_20%,transparent)] text-[var(--color-success)]',
-  warning: 'bg-[color-mix(in_srgb,var(--color-warning)_20%,transparent)] text-[var(--color-warning)]',
-  danger: 'bg-[color-mix(in_srgb,var(--color-error)_20%,transparent)] text-[var(--color-error)]',
+  default: 'bg-surface-blue text-accent-dark',
+  success: 'bg-green-50 text-green-700',
+  warning: 'bg-amber-50 text-amber-700',
+  danger: 'bg-red-50 text-red-700',
 };
 
 export const Badge = ({ children, variant = 'default', className = '' }: BadgeProps) => {

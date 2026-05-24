@@ -12,7 +12,7 @@ const sizeMap: Record<NonNullable<SpinnerProps['size']>, string> = {
 export const Spinner = ({ size = 'md', className = '' }: SpinnerProps) => {
   return (
     <span
-      className={`inline-block animate-spin rounded-full border-[var(--color-border)] border-t-[var(--color-accent)] ${sizeMap[size]} ${className}`}
+      className={`inline-block animate-spin rounded-full border-border border-t-accent ${sizeMap[size]} ${className}`}
       role="status"
       aria-label="Cargando"
     />

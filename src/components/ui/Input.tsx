@@ -11,16 +11,16 @@ export const Input = ({ label, error, id, className = '', ...props }: InputProps
   return (
     <div className="w-full">
       {label && (
-        <label htmlFor={inputId} className="mb-1.5 block text-sm font-medium text-[var(--color-foreground)]">
+        <label htmlFor={inputId} className="mb-1.5 block text-sm font-medium text-foreground">
           {label}
         </label>
       )}
       <input
         id={inputId}
-        className={`w-full rounded-md border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-sm text-[var(--color-foreground)] outline-none transition placeholder:text-[var(--color-foreground-muted)] focus:border-[var(--color-accent)] focus:ring-2 focus:ring-[color-mix(in_srgb,var(--color-accent)_35%,transparent)] ${error ? 'border-[var(--color-error)] focus:border-[var(--color-error)] focus:ring-[color-mix(in_srgb,var(--color-error)_35%,transparent)]' : ''} ${className}`}
+        className={`w-full rounded-lg border border-border bg-background-alt px-3.5 py-2.5 text-sm text-foreground outline-none transition placeholder:text-foreground-muted focus:border-accent focus:bg-white focus:ring-2 focus:ring-accent/20 disabled:cursor-not-allowed disabled:opacity-60 ${error ? 'border-error focus:border-error focus:ring-error/20' : ''} ${className}`}
         {...props}
       />
-      {error && <p className="mt-1 text-xs text-[var(--color-error)]">{error}</p>}
+      {error && <p className="mt-1.5 text-xs text-error">{error}</p>}
     </div>
   );
 };
