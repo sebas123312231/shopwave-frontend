@@ -2,9 +2,12 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { ArrowRight, Sparkles } from 'lucide-react';
 import { ProductService } from '@/services/product.service';
 import { Product } from '@/models/product.model';
-import { formatPrice } from '@/utils/currency.util';
+import { ProductList } from '@/components/products/ProductList';
+
+const HERO_IMAGE = 'https://img.pikbest.com/ai/illus_our/20230427/6bec2b604cd4efc90ea8265ea5eafe61.jpg!bw800';
 
 export default function HomePage() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -27,40 +30,80 @@ export default function HomePage() {
   }, []);
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <section className="mb-12 rounded-xl bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-accent)] p-8 text-white">
-        <h1 className="mb-4 text-4xl font-bold">Bienvenido a ShopWave Fusion</h1>
-        <p className="text-lg">Tu tienda online favorita con los mejores productos</p>
-        <Link href="/products" className="mt-4 inline-block rounded-md bg-white px-6 py-2 font-semibold text-[var(--color-primary)] hover:bg-gray-100">
-          Ver Productos
-        </Link>
+    <div className="min-h-screen">
+      <section
+        className="relative overflow-hidden rounded-3xl mx-4 md:mx-8 min-h-[480px] md:min-h-[560px] flex items-center"
+        style={{
+          backgroundImage: `linear-gradient(to right, rgba(15, 23, 42, 0.92) 0%, rgba(15, 23, 42, 0.75) 50%, rgba(30, 58, 95, 0.6) 100%), url(${HERO_IMAGE})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+        }}
+      >
+        <div className="absolute top-0 right-0 w-96 h-96 bg-accent/20 rounded-full blur-3xl opacity-50" />
+        <div className="absolute bottom-0 left-1/4 w-64 h-64 bg-accent/10 rounded-full blur-2xl opacity-30" />
+
+        <div className="relative z-10 px-8 md:px-16 py-12 max-w-2xl">
+          <div className="animate-slideUp">
+            <span className="inline-flex items-center gap-2 text-sm uppercase tracking-[0.25em] text-blue-300/80 mb-4">
+              <Sparkles size={16} />
+              Nueva colección
+            </span>
+          </div>
+
+          <h1
+            className="animate-slideUp text-5xl md:text-7xl font-extrabold text-white tracking-tight leading-tight mb-4"
+            style={{ animationDelay: '100ms' }}
+          >
+            Encuentra tu próximo producto favorito
+          </h1>
+
+          <p
+            className="animate-slideUp text-lg text-blue-100/80 max-w-xl mb-8"
+            style={{ animationDelay: '200ms' }}
+          >
+            Explora el catálogo completo con filtros por precio, categoría y descuento para comprar más rápido.
+          </p>
+
+          <div className="animate-slideUp" style={{ animationDelay: '300ms' }}>
+            <Link
+              href="/products"
+              className="inline-flex items-center gap-2 bg-accent text-white px-8 py-4 rounded-xl text-base font-semibold hover:bg-accent-dark transition-all hover:shadow-lg hover:shadow-blue-500/30 hover:scale-[1.02] active:scale-[0.98]"
+            >
+              Ver catálogo
+              <ArrowRight size={20} />
+            </Link>
+          </div>
+        </div>
       </section>
 
-      <h2 className="mb-6 text-2xl font-bold text-[var(--color-foreground)]">Productos Destacados</h2>
-      {isLoading ? (
-        <p className="text-center text-[var(--color-foreground-muted)]">Cargando productos...</p>
-      ) : error ? (
-        <p className="text-center text-[var(--color-error)]">{error}</p>
-      ) : products.length === 0 ? (
-        <p className="text-center text-[var(--color-foreground-muted)]">No hay productos disponibles</p>
-      ) : (
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-          {products.map((product) => (
-            <Link key={product.id} href={`/products/${product.id}`} className="group rounded-lg bg-[var(--color-surface)] p-4 shadow-md transition hover:bg-[var(--color-surface-hover)] border border-[var(--color-border)]">
-              <div className="aspect-square overflow-hidden rounded-md bg-[var(--color-background-alt)]">
-                <img src={product.imageUrl} alt={product.title} className="h-full w-full object-cover" />
-              </div>
-              <h3 className="mt-2 font-semibold text-[var(--color-foreground)]">{product.title}</h3>
-              <div className="mt-1 flex items-center gap-2">
-                <span className="font-bold text-[var(--color-accent)]">{formatPrice(product.discountedPrice)}</span>
-                {product.discountPersent > 0 && (
-                  <span className="text-sm text-[var(--color-foreground-muted)] line-through">{formatPrice(product.price)}</span>
-                )}
-              </div>
-            </Link>
-          ))}
+      <section className="mt-12 mx-4 md:mx-8">
+        <div className="flex items-center justify-between mb-8">
+          <h2 className="text-3xl md:text-4xl font-bold text-foreground tracking-tight">Productos destacados</h2>
+          <Link
+            href="/products"
+            className="text-sm font-semibold text-accent hover:text-accent-dark transition-colors flex items-center gap-1"
+          >
+            Ver todos
+            <ArrowRight size={16} />
+          </Link>
         </div>
-      )}
+
+        <div className="animate-fadeIn">
+          <ProductList
+            products={products}
+            loading={isLoading}
+            error={error || null}
+            emptyMessage="No hay productos disponibles por el momento."
+          />
+        </div>
+      </section>
+
+      <footer className="mt-16 bg-gradient-to-r from-primary to-primary-light text-white">
+        <div className="mx-auto max-w-7xl px-4 py-10 text-center">
+          <h3 className="text-xl font-bold mb-2">ShopWave Fusion</h3>
+          <p className="text-sm text-white/60">© 2026 ShopWave Fusion. Todos los derechos reservados.</p>
+        </div>
+      </footer>
     </div>
   );
 }
