@@ -1,11 +1,9 @@
 'use client';
-
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { Product } from '@/models/product.model';
 import { formatPrice } from '@/utils/currency.util';
-import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
-import { Star, ShoppingCart, Minus, Plus } from 'lucide-react';
+import { Star } from 'lucide-react';
 
 interface ProductDetailProps {
   product: Product;
@@ -18,13 +16,6 @@ export const ProductDetail = ({ product, averageRating, ratingsCount }: ProductD
     () => product.sizes?.filter((size) => size.quantity > 0).map((size) => size.name) ?? [],
     [product.sizes],
   );
-
-  const [selectedSize, setSelectedSize] = useState<string>(availableSizes[0] ?? '');
-  const [quantity, setQuantity] = useState(1);
-
-  const handleAddToCart = () => {
-    console.log('TODO add to cart', { productId: product.id, selectedSize, quantity });
-  };
 
   const renderStars = (rating: number) => {
     return Array.from({ length: 5 }, (_, i) => (
@@ -76,53 +67,52 @@ export const ProductDetail = ({ product, averageRating, ratingsCount }: ProductD
 
         {availableSizes.length > 0 && (
           <div className="space-y-3">
-            <p className="text-sm font-semibold text-foreground">Talla</p>
+            <p className="text-sm font-semibold text-foreground">Tallas disponibles</p>
             <div className="flex flex-wrap gap-2">
               {availableSizes.map((size) => (
-                <button
+                <span
                   key={size}
-                  onClick={() => setSelectedSize(size)}
-                  className={`rounded-xl border px-4 py-2.5 text-sm font-medium transition-all ${
-                    selectedSize === size
-                      ? 'border-accent bg-accent text-white shadow-md'
-                      : 'border-border bg-white text-foreground hover:border-accent hover:bg-accent/5'
-                  }`}
+                  className="rounded-xl border border-border bg-white px-4 py-2.5 text-sm font-medium text-foreground"
                 >
                   {size}
-                </button>
+                </span>
               ))}
             </div>
           </div>
         )}
 
-        <div className="flex items-center gap-4">
-          <div className="flex items-center rounded-xl border border-border bg-white">
-            <button
-              onClick={() => setQuantity(Math.max(1, quantity - 1))}
-              className="p-2.5 hover:bg-background-alt transition-colors rounded-l-xl"
-            >
-              <Minus size={16} />
-            </button>
-            <span className="w-12 text-center font-medium">{quantity}</span>
-            <button
-              onClick={() => setQuantity(Math.min(product.quantity, quantity + 1))}
-              className="p-2.5 hover:bg-background-alt transition-colors rounded-r-xl"
-            >
-              <Plus size={16} />
-            </button>
-          </div>
-          <span className="text-sm text-foreground-muted">Stock: {product.quantity}</span>
+        <div className="flex items-center gap-2 text-sm text-foreground-muted">
+          <span>Stock disponible:</span>
+          <span className="font-semibold text-foreground">{product.quantity}</span>
         </div>
 
-        <Button
-          size="lg"
-          className="w-full sm:w-auto"
-          onClick={handleAddToCart}
-          disabled={product.quantity <= 0}
-        >
-          <ShoppingCart size={20} />
-          Agregar al carrito
-        </Button>
+        {/*
+         * CARRITO - PENDIENTE DE DESARROLLO
+         * ===================================
+         * El siguiente bloque contiene la selección de cantidad y
+         * el botón "Agregar al carrito". Se activa cuando el módulo
+         * de carrito esté completamente funcional.
+         *
+         * const [selectedSize, setSelectedSize] = useState<string>(availableSizes[0] ?? '');
+         * const [quantity, setQuantity] = useState(1);
+         *
+         * const handleAddToCart = () => {
+         *   CartContext.addItem(product.id, selectedSize, quantity, product.discountedPrice);
+         * };
+         *
+         * <div className="flex items-center gap-4">
+         *   <div className="flex items-center rounded-xl border border-border bg-white">
+         *     <button onClick={() => setQuantity(Math.max(1, quantity - 1))}><Minus /></button>
+         *     <span>{quantity}</span>
+         *     <button onClick={() => setQuantity(Math.min(product.quantity, quantity + 1))}><Plus /></button>
+         *   </div>
+         * </div>
+         *
+         * <Button size="lg" onClick={handleAddToCart} disabled={product.quantity <= 0}>
+         *   <ShoppingCart size={20} />
+         *   Agregar al carrito
+         * </Button>
+         */}
       </div>
     </section>
   );

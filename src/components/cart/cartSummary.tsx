@@ -1,5 +1,23 @@
+/*
+ * ================================================================
+ * CartSummary — MÓDULO EN DESARROLLO / ERRORES PENDIENTES
+ * ================================================================
+ * Este componente muestra el resumen de totales del carrito
+ * y el botón para proceder al checkout.
+ * Está deshabilitado hasta que el módulo de carrito sea completado.
+ *
+ * TODO:
+ *   - Calcular totales dinámicamente desde el backend
+ *   - Mostrar desglose de descuentos por ítem
+ *   - Conectar botón de checkout con validación de stock
+ * ================================================================
+ */
+
 'use client';
 
+export const CartSummary = () => null;
+
+/*
 import React from 'react';
 import { useRouter } from 'next/navigation';
 import { Cart } from '@/models/cart.model';
@@ -13,8 +31,7 @@ interface CartSummaryProps {
 
 export const CartSummary: React.FC<CartSummaryProps> = ({ cart, showCheckoutButton = true }) => {
   const router = useRouter();
-
-  const formatPrice = (price: number) =>
+  const fmt = (price: number) =>
     new Intl.NumberFormat('es-BO', { style: 'currency', currency: 'BOB' }).format(price);
 
   return (
@@ -23,45 +40,32 @@ export const CartSummary: React.FC<CartSummaryProps> = ({ cart, showCheckoutButt
         <ShoppingBag size={20} className="text-accent" />
         <h2 className="text-lg font-bold text-foreground">Resumen de Compra</h2>
       </div>
-
       <div className="space-y-3 text-sm text-foreground-muted">
         <div className="flex justify-between">
-          <span>
-            Total Productos ({cart.totalItem} {cart.totalItem === 1 ? 'item' : 'items'})
-          </span>
-          <span className="font-medium text-foreground">{formatPrice(cart.totalPrice)}</span>
+          <span>Productos ({cart.totalItem})</span>
+          <span className="font-medium text-foreground">{fmt(cart.totalPrice)}</span>
         </div>
-
         {cart.discounte > 0 && (
           <div className="flex justify-between text-success font-medium">
             <span>Tu Ahorro</span>
-            <span>-{formatPrice(cart.discounte)}</span>
+            <span>-{fmt(cart.discounte)}</span>
           </div>
         )}
-
         <div className="flex justify-between">
           <span>Envío</span>
           <span className="text-success font-medium">Gratis</span>
         </div>
-
-        <div className="border-t border-border pt-3 mt-2 flex justify-between text-base font-bold text-foreground">
+        <div className="border-t border-border pt-3 flex justify-between text-base font-bold text-foreground">
           <span>Total a Pagar</span>
-          <span>{formatPrice(cart.totalDiscountedPrice)}</span>
+          <span>{fmt(cart.totalDiscountedPrice)}</span>
         </div>
       </div>
-
       {showCheckoutButton && (
-        <Button
-          type="button"
-          variant="primary"
-          size="lg"
-          className="w-full mt-6"
-          onClick={() => router.push('/checkout')}
-        >
-          Proceder al Checkout
-          <ArrowRight size={18} />
+        <Button type="button" size="lg" className="w-full mt-6" onClick={() => router.push('/checkout')}>
+          Proceder al Checkout <ArrowRight size={18} />
         </Button>
       )}
     </div>
   );
 };
+*/
