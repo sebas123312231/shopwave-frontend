@@ -1,23 +1,29 @@
 import { Order } from '@/models/order.model';
-import OrderCard from './OrderCard';
+import { OrderCard } from './OrderCard';
+import { ClipboardList } from 'lucide-react';
+import Link from 'next/link';
 
-interface PropiedadesOrderList {
-  ordenes: Order[];
+interface OrderListProps {
+  orders: Order[];
 }
 
-export default function OrderList({ ordenes }: PropiedadesOrderList) {
-  if (ordenes.length === 0) {
+export function OrderList({ orders }: OrderListProps) {
+  if (orders.length === 0) {
     return (
-      <div className="text-center py-12 border border-dashed border-gray-300 rounded-xl bg-gray-50">
-        <p className="text-gray-500 font-medium">No tienes ninguna orden registrada todavía.</p>
+      <div className="bg-surface border-2 border-dashed border-border rounded-2xl p-12 text-center animate-fadeIn">
+        <ClipboardList size={40} className="mx-auto text-foreground-muted mb-3" />
+        <p className="text-foreground-muted font-medium">No tienes ninguna orden registrada todavía.</p>
+        <Link href="/products" className="inline-block mt-4 text-accent hover:text-accent-dark font-medium text-sm">
+          Explorar productos
+        </Link>
       </div>
     );
   }
 
   return (
     <div className="space-y-4">
-      {ordenes.map((ordenIndividual) => (
-        <OrderCard key={ordenIndividual.id} orden={ordenIndividual} />
+      {orders.map((order) => (
+        <OrderCard key={order.id} order={order} />
       ))}
     </div>
   );
