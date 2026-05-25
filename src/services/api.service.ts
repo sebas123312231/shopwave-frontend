@@ -1,7 +1,18 @@
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
+import { getToken, removeToken, isTokenExpired } from '@/utils/token.util';
+
+const API_PREFIX = '/api';
 
 async function handleResponse<T>(response: Response): Promise<T> {
   if (!response.ok) {
+    if (response.status === 401) {
+      const token = getToken();
+      if (!token || isTokenExpired(token)) {
+        removeToken();
+        window.dispatchEvent(new CustomEvent('auth:unauthorized'));
+      }
+      throw new Error('Sesión expirada. Por favor inicia sesión de nuevo.');
+    }
+
     const error = await response.json().catch(() => ({}));
     throw new Error(error.message || `Error ${response.status}: ${response.statusText}`);
   }
@@ -15,7 +26,7 @@ function getHeaders(requireAuth: boolean): Record<string, string> {
   };
 
   if (requireAuth) {
-    const token = localStorage.getItem('shopwave_token');
+    const token = getToken();
     if (token) {
       headers['Authorization'] = token;
     }
@@ -24,9 +35,20 @@ function getHeaders(requireAuth: boolean): Record<string, string> {
   return headers;
 }
 
+function extractTokenFromBody(data: unknown): string | null {
+  if (!data || typeof data !== 'object') return null;
+  const obj = data as Record<string, unknown>;
+  for (const key of ['token', 'jwt', 'accessToken', 'access_token', 'authToken', 'authorization']) {
+    if (typeof obj[key] === 'string' && (obj[key] as string).length > 20) {
+      return obj[key] as string;
+    }
+  }
+  return null;
+}
+
 export const api = {
   get: async <T>(url: string, requireAuth = false): Promise<T> => {
-    const response = await fetch(`${BASE_URL}${url}`, {
+    const response = await fetch(`${API_PREFIX}${url}`, {
       method: 'GET',
       headers: getHeaders(requireAuth),
     });
@@ -34,7 +56,7 @@ export const api = {
   },
 
   post: async <T>(url: string, body: unknown, requireAuth = false): Promise<T> => {
-    const response = await fetch(`${BASE_URL}${url}`, {
+    const response = await fetch(`${API_PREFIX}${url}`, {
       method: 'POST',
       headers: getHeaders(requireAuth),
       body: JSON.stringify(body),
@@ -43,7 +65,7 @@ export const api = {
   },
 
   put: async <T>(url: string, body: unknown, requireAuth = false): Promise<T> => {
-    const response = await fetch(`${BASE_URL}${url}`, {
+    const response = await fetch(`${API_PREFIX}${url}`, {
       method: 'PUT',
       headers: getHeaders(requireAuth),
       body: JSON.stringify(body),
@@ -52,7 +74,7 @@ export const api = {
   },
 
   del: async <T>(url: string, requireAuth = false): Promise<T> => {
-    const response = await fetch(`${BASE_URL}${url}`, {
+    const response = await fetch(`${API_PREFIX}${url}`, {
       method: 'DELETE',
       headers: getHeaders(requireAuth),
     });
@@ -61,7 +83,7 @@ export const api = {
 
   loginBasic: async (email: string, password: string): Promise<string> => {
     const basic = btoa(`${email}:${password}`);
-    const response = await fetch(`${BASE_URL}/auth/signin`, {
+    const response = await fetch(`${API_PREFIX}/auth/signin`, {
       method: 'GET',
       headers: {
         Authorization: `Basic ${basic}`,
@@ -73,10 +95,28 @@ export const api = {
       throw new Error(error.message || 'Credenciales inválidas');
     }
 
-    const jwt = response.headers.get('Authorization');
-    if (!jwt) {
-      throw new Error('No se recibió token de autenticación');
+    const fromHeader = response.headers.get('Authorization');
+    if (fromHeader) {
+      return fromHeader.startsWith('Bearer ') ? fromHeader.slice(7) : fromHeader;
     }
-    return jwt;
+
+    const cloned = response.clone();
+    try {
+      const body = await cloned.json();
+      const fromBody = extractTokenFromBody(body);
+      if (fromBody) {
+        return fromBody.startsWith('Bearer ') ? fromBody.slice(7) : fromBody;
+      }
+    } catch {}
+
+    try {
+      const text = await response.clone().text();
+      if (text && text.length > 20 && text.includes('.')) {
+        const trimmed = text.trim();
+        return trimmed.startsWith('Bearer ') ? trimmed.slice(7) : trimmed;
+      }
+    } catch {}
+
+    throw new Error('No se recibió token de autenticación. Verifica la configuración del backend.');
   },
 };
