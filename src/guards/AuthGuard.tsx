@@ -6,19 +6,30 @@ import { useAuth } from '@/context/AuthContext';
 import { Spinner } from '@/components/ui/Spinner';
 
 export const AuthGuard = ({ children }: { children: React.ReactNode }) => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, isLoading } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
-    if (!isAuthenticated) {
+    if (!isLoading && !isAuthenticated) {
       router.push('/login');
     }
-  }, [isAuthenticated, router]);
+  }, [isLoading, isAuthenticated, router]);
+
+  if (isLoading) {
+    return (
+      <div className="flex h-screen items-center justify-center bg-background">
+        <div className="flex flex-col items-center gap-3">
+          <Spinner size="lg" />
+          <p className="text-sm text-foreground-muted">Verificando sesión...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (!isAuthenticated) {
     return (
-      <div className="flex min-h-[80vh] items-center justify-center">
-        <div className="flex flex-col items-center gap-4 rounded-2xl bg-white p-8 shadow-lg border border-border">
+      <div className="flex h-screen items-center justify-center bg-background">
+        <div className="flex flex-col items-center gap-3">
           <Spinner size="lg" />
           <p className="text-sm text-foreground-muted">Redirigiendo al inicio de sesión...</p>
         </div>
