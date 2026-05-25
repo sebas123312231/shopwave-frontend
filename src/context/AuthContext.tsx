@@ -1,7 +1,7 @@
 'use client';
 
-import React, { createContext, useContext, useEffect, useState } from 'react';
-import { getToken, removeToken, decodeToken } from '@/utils/token.util';
+import React, { createContext, useContext, useEffect, useState, useCallback, useRef } from 'react';
+import { getToken, removeToken, decodeToken, isTokenExpired } from '@/utils/token.util';
 import { JwtPayload } from '@/models/auth.model';
 import { Role } from '@/types/role.type';
 
@@ -10,8 +10,9 @@ interface AuthContextType {
   isAdmin: boolean;
   userEmail: string | null;
   role: Role | null;
+  isLoading: boolean;
   logout: () => void;
-  refreshAuth: () => void;
+  refreshAuth: () => boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -22,16 +23,31 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     isAdmin: boolean;
     userEmail: string | null;
     role: Role | null;
+    isLoading: boolean;
   }>({
     isAuthenticated: false,
     isAdmin: false,
     userEmail: null,
     role: null,
+    isLoading: true,
   });
 
-  const refreshAuth = () => {
+  const mountedRef = useRef(false);
+
+  const refreshAuth = useCallback((): boolean => {
     const token = getToken();
     if (token) {
+      if (isTokenExpired(token)) {
+        removeToken();
+        setAuthState({
+          isAuthenticated: false,
+          isAdmin: false,
+          userEmail: null,
+          role: null,
+          isLoading: false,
+        });
+        return false;
+      }
       try {
         const decoded = decodeToken(token) as unknown as JwtPayload;
         const authorities = decoded.authorities || '';
@@ -42,25 +58,63 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           isAdmin,
           userEmail: decoded.username,
           role,
+          isLoading: false,
         });
+        return true;
       } catch {
         removeToken();
-        setAuthState({ isAuthenticated: false, isAdmin: false, userEmail: null, role: null });
+        setAuthState({
+          isAuthenticated: false,
+          isAdmin: false,
+          userEmail: null,
+          role: null,
+          isLoading: false,
+        });
+        return false;
       }
     } else {
-      setAuthState({ isAuthenticated: false, isAdmin: false, userEmail: null, role: null });
+      setAuthState({
+        isAuthenticated: false,
+        isAdmin: false,
+        userEmail: null,
+        role: null,
+        isLoading: false,
+      });
+      return false;
     }
-  };
-
-  useEffect(() => {
-    refreshAuth();
   }, []);
 
-  const logout = () => {
+  const logout = useCallback(() => {
     removeToken();
-    setAuthState({ isAuthenticated: false, isAdmin: false, userEmail: null, role: null });
-    window.location.href = '/login';
-  };
+    setAuthState({
+      isAuthenticated: false,
+      isAdmin: false,
+      userEmail: null,
+      role: null,
+      isLoading: false,
+    });
+  }, []);
+
+  useEffect(() => {
+    if (!mountedRef.current) {
+      mountedRef.current = true;
+      refreshAuth();
+    }
+  }, [refreshAuth]);
+
+  useEffect(() => {
+    const handleUnauthorized = () => {
+      const token = getToken();
+      if (!token || isTokenExpired(token)) {
+        logout();
+      }
+    };
+
+    window.addEventListener('auth:unauthorized', handleUnauthorized);
+    return () => {
+      window.removeEventListener('auth:unauthorized', handleUnauthorized);
+    };
+  }, [logout]);
 
   return (
     <AuthContext.Provider value={{ ...authState, logout, refreshAuth }}>

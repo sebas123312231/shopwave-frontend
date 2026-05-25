@@ -1,7 +1,8 @@
 'use client';
 
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { Cart, CartItem } from '@/models/cart.model';
+import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
+import { useAuth } from '@/context/AuthContext';
+import { Cart } from '@/models/cart.model';
 import { CartService } from '@/services/cart.service';
 import { CartItemService } from '@/services/cartItem.service';
 
@@ -17,17 +18,43 @@ interface CartContextType {
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
+const CART_TIMEOUT = 8000;
+
 export const CartProvider = ({ children }: { children: React.ReactNode }) => {
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
   const [cart, setCart] = useState<Cart | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const prevAuthRef = useRef(false);
 
   const refreshCart = useCallback(async () => {
     setLoading(true);
+    setError(null);
+
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+
+    timeoutRef.current = setTimeout(() => {
+      setLoading(false);
+      setError('No se pudo conectar con el servidor. Verifica tu conexión e inténtalo de nuevo.');
+      setCart(null);
+    }, CART_TIMEOUT);
+
     try {
       const data = await CartService.getCart();
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+        timeoutRef.current = null;
+      }
       setCart(data);
+      setError(null);
     } catch (err: unknown) {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+        timeoutRef.current = null;
+      }
       setError(err instanceof Error ? err.message : 'Error al cargar carrito');
     } finally {
       setLoading(false);
@@ -50,9 +77,26 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   useEffect(() => {
-    const token = localStorage.getItem('shopwave_token');
-    if (token) refreshCart();
-  }, [refreshCart]);
+    if (authLoading) return;
+
+    if (isAuthenticated && !prevAuthRef.current) {
+      prevAuthRef.current = true;
+      refreshCart();
+    } else if (!isAuthenticated) {
+      prevAuthRef.current = false;
+      setCart(null);
+      setLoading(false);
+      setError(null);
+    }
+  }, [isAuthenticated, authLoading, refreshCart]);
+
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, []);
 
   return (
     <CartContext.Provider value={{ cart, loading, error, addItem, updateItem, removeItem, refreshCart }}>
