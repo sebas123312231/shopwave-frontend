@@ -34,7 +34,7 @@ export default function RegisterPage() {
     try {
       await AuthService.register(formData);
       setSuccess(true);
-      setTimeout(() => router.push('/login'), 2000);
+      setTimeout(() => { window.location.href = '/login'; }, 2000);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error al registrar');
     } finally {

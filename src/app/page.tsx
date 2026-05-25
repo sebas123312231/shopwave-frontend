@@ -32,7 +32,7 @@ export default function HomePage() {
   return (
     <div className="min-h-screen">
       <section
-        className="relative overflow-hidden rounded-3xl mx-4 md:mx-8 min-h-[480px] md:min-h-[560px] flex items-center"
+        className="relative overflow-hidden rounded-3xl mx-4 mt-4 md:mx-8 md:mt-8 min-h-[480px] md:min-h-[560px] flex items-center bg-primary"
         style={{
           backgroundImage: `linear-gradient(to right, rgba(15, 23, 42, 0.92) 0%, rgba(15, 23, 42, 0.75) 50%, rgba(30, 58, 95, 0.6) 100%), url(${HERO_IMAGE})`,
           backgroundSize: 'cover',

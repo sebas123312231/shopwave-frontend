@@ -1,10 +1,10 @@
 import { api } from './api.service';
-import { Cart, CartItem } from '@/models/cart.model';
-import { AddItemRequest } from '@/models/cart.model';
+import { Cart, CartItem, AddItemRequest } from '@/models/cart.model';
+import { CartItemService } from './cartItem.service';
 
 export const CartService = {
   getCart: async (): Promise<Cart> => {
-    return api.get<Cart>('/cart/', true);
+    return api.get<Cart>('/cart', true);
   },
 
   addItem: async (req: AddItemRequest): Promise<CartItem> => {

@@ -1,10 +1,9 @@
 import { api } from './api.service';
-import { Order } from '@/models/order.model';
-import { CreateOrderRequest } from '@/models/order.model';
+import { Order, CreateOrderRequest } from '@/models/order.model';
 
 export const OrderService = {
   create: async (req: CreateOrderRequest): Promise<Order> => {
-    return api.post<Order>('/orders/', req, true);
+    return api.post<Order>('/orders', req, true);
   },
 
   getUserOrders: async (): Promise<Order[]> => {

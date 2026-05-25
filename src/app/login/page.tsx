@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { AuthService } from '@/services/auth.service';
 import { Input } from '@/components/ui/Input';
@@ -9,7 +8,6 @@ import { Button } from '@/components/ui/Button';
 import { LogIn, Package } from 'lucide-react';
 
 export default function LoginPage() {
-  const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -25,7 +23,6 @@ export default function LoginPage() {
       window.location.href = '/';
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error al iniciar sesión');
-    } finally {
       setIsLoading(false);
     }
   };
