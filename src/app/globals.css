@@ -1,147 +1,66 @@
 @import "tailwindcss";
 
-:root {
+@theme {
   --color-primary: #0f172a;
   --color-primary-light: #1e293b;
   --color-primary-dark: #020617;
-
   --color-accent: #3b82f6;
   --color-accent-light: #60a5fa;
   --color-accent-dark: #2563eb;
-
   --color-background: #f8fafc;
   --color-background-alt: #f1f5f9;
-
   --color-surface: #ffffff;
   --color-surface-hover: #f8fafc;
-
   --color-foreground: #0f172a;
   --color-foreground-muted: #64748b;
-
   --color-border: #e2e8f0;
-
   --color-success: #22c55e;
   --color-warning: #f59e0b;
   --color-error: #ef4444;
-
   --color-surface-blue: #dbeafe;
 
-  --gradient-hero: linear-gradient(135deg, #0f172a 0%, #1e3a5f 50%, #0f172a 100%);
-  --gradient-sidebar: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
-  --gradient-cta: linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%);
+  --animate-fadeIn: fadeIn 0.3s ease-out forwards;
+  --animate-slideUp: slideUp 0.4s ease-out forwards;
+  --animate-slideInLeft: slideInLeft 0.3s ease-out forwards;
+  --animate-slideInRight: slideInRight 0.3s ease-out forwards;
+  --animate-scaleIn: scaleIn 0.3s ease-out forwards;
+}
 
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 16px;
-  --radius-xl: 24px;
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(-20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
 }
 
 body {
   background: var(--color-background);
   color: var(--color-foreground);
-  font-family: var(--font-geist-sans), system-ui, sans-serif;
+  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
 }
 
-@layer base {
-  a {
-    color: var(--color-accent);
-    transition: color 200ms ease-in-out;
-  }
-
-  a:hover {
-    color: var(--color-accent-dark);
-  }
+a {
+  color: var(--color-accent);
 }
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes slideUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes slideInLeft {
-  from {
-    opacity: 0;
-    transform: translateX(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-@keyframes slideInRight {
-  from {
-    opacity: 0;
-    transform: translateX(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-@keyframes scaleIn {
-  from {
-    opacity: 0;
-    transform: scale(0.95);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-.animate-fadeIn {
-  animation: fadeIn 300ms ease-out forwards;
-}
-
-.animate-slideUp {
-  animation: slideUp 400ms ease-out forwards;
-}
-
-.animate-slideInLeft {
-  animation: slideInLeft 300ms ease-out forwards;
-}
-
-.animate-slideInRight {
-  animation: slideInRight 300ms ease-out forwards;
-}
-
-.animate-scaleIn {
-  animation: scaleIn 300ms ease-out forwards;
-}
-
-.animation-delay-100 {
-  animation-delay: 100ms;
-}
-
-.animation-delay-200 {
-  animation-delay: 200ms;
-}
-
-.animation-delay-300 {
-  animation-delay: 300ms;
-}
-
-.animation-delay-400 {
-  animation-delay: 400ms;
-}
-
-.animation-delay-500 {
-  animation-delay: 500ms;
+a:hover {
+  color: var(--color-accent-dark);
 }
