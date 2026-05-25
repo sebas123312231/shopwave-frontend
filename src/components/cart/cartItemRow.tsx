@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { CartItem } from '@/models/cart.model';
 import { useCart } from '@/hooks/useCart';
 import { Button } from '@/components/ui/Button';
+import { Trash2 } from 'lucide-react';
 
 interface CartItemRowProps {
   item: CartItem;
@@ -26,7 +27,7 @@ export const CartItemRow: React.FC<CartItemRowProps> = ({ item }) => {
   };
 
   const handleRemove = async () => {
-    if (window.confirm(`¿Estás seguro de que deseas eliminar ${item.product.title} del carrito?`)) {
+    if (window.confirm(`¿Estás seguro de que deseas eliminar "${item.product.title}" del carrito?`)) {
       setUpdating(true);
       try {
         await removeItem(item.id);
@@ -38,47 +39,53 @@ export const CartItemRow: React.FC<CartItemRowProps> = ({ item }) => {
     }
   };
 
+  const formatPrice = (price: number) =>
+    new Intl.NumberFormat('es-BO', { style: 'currency', currency: 'BOB' }).format(price);
+
   return (
-    <div className="flex flex-col sm:grid sm:grid-cols-12 items-start sm:items-center justify-between border-b border-[var(--color-border)] py-4 gap-4">
-      {/* Detalle Producto (Columna 6) */}
+    <div className="flex flex-col sm:grid sm:grid-cols-12 items-start sm:items-center justify-between py-5 gap-4 animate-slideUp">
+      {/* Producto */}
       <div className="flex items-center gap-4 w-full sm:col-span-6 min-w-0">
         <img
           src={item.product.imageUrl || '/placeholder-product.png'}
           alt={item.product.title}
-          className="w-20 h-24 object-cover rounded bg-[var(--color-surface)] flex-shrink-0 border border-[var(--color-border)]"
+          className="w-20 h-24 object-cover rounded-xl bg-background-alt flex-shrink-0 border border-border"
         />
         <div className="flex-1 min-w-0">
-          <h3 className="font-semibold text-[var(--color-foreground)] truncate">{item.product.title}</h3>
-          <p className="text-sm text-[var(--color-foreground-muted)] mt-0.5">Marca: {item.product.brand}</p>
-          <p className="text-sm text-[var(--color-foreground-muted)] mt-1">
-            Talla: <span className="font-medium bg-[var(--color-surface-hover)] px-2 py-0.5 rounded text-xs text-[var(--color-foreground)]">{item.size}</span>
+          <h3 className="font-semibold text-foreground truncate">{item.product.title}</h3>
+          <p className="text-sm text-foreground-muted mt-0.5">Marca: {item.product.brand}</p>
+          <p className="text-sm text-foreground-muted mt-1">
+            Talla:{" "}
+            <span className="font-medium bg-background-alt px-2.5 py-0.5 rounded-lg text-xs text-foreground border border-border">
+              {item.size}
+            </span>
           </p>
           {/* Vista móvil del precio */}
-          <div className="flex flex-col mt-1 sm:hidden">
-            <span className="text-xs text-[var(--color-foreground-muted)]">
-              Precio Unit: ${item.discountedPrice}
+          <div className="flex flex-col mt-2 sm:hidden">
+            <span className="text-xs text-foreground-muted">
+              Precio Unit: {formatPrice(item.discountedPrice)}
             </span>
-            <span className="font-bold text-[var(--color-foreground)] mt-0.5">
-              Subtotal: ${(item.discountedPrice * item.quantity)}
+            <span className="font-bold text-foreground mt-0.5">
+              Subtotal: {formatPrice(item.discountedPrice * item.quantity)}
             </span>
           </div>
         </div>
       </div>
 
-      {/* Selector de Cantidad (Columna 3) */}
+      {/* Cantidad */}
       <div className="flex items-center justify-center w-full sm:w-auto sm:col-span-3">
-        <div className="flex items-center border border-[var(--color-border)] rounded bg-[var(--color-surface)]">
+        <div className="flex items-center border border-border rounded-xl bg-background-alt overflow-hidden">
           <Button
             type="button"
             variant="ghost"
             size="sm"
             disabled={item.quantity <= 1 || updating}
             onClick={() => handleQuantityChange(item.quantity - 1)}
-            className="px-2 py-1 min-w-[2rem]"
+            className="px-3 py-1 rounded-none"
           >
             -
           </Button>
-          <span className="px-2 py-1 font-medium text-[var(--color-foreground)] text-sm min-w-[2rem] text-center">
+          <span className="px-3 py-1 font-medium text-foreground text-sm min-w-[2.5rem] text-center">
             {item.quantity}
           </span>
           <Button
@@ -87,34 +94,35 @@ export const CartItemRow: React.FC<CartItemRowProps> = ({ item }) => {
             size="sm"
             disabled={updating}
             onClick={() => handleQuantityChange(item.quantity + 1)}
-            className="px-2 py-1 min-w-[2rem]"
+            className="px-3 py-1 rounded-none"
           >
             +
           </Button>
         </div>
       </div>
 
-      {/* Precio Unitario y Subtotal en Desktop (Columna 2) */}
+      {/* Precio Desktop */}
       <div className="hidden sm:flex flex-col items-end sm:col-span-2 pr-2">
-        <span className="font-bold text-[var(--color-foreground)]">
-          ${(item.discountedPrice * item.quantity)}
+        <span className="font-bold text-foreground">
+          {formatPrice(item.discountedPrice * item.quantity)}
         </span>
-        <span className="text-xs text-[var(--color-foreground-muted)] mt-0.5">
-          ({item.quantity} x ${item.discountedPrice})
+        <span className="text-xs text-foreground-muted mt-0.5">
+          ({item.quantity} x {formatPrice(item.discountedPrice)})
         </span>
       </div>
 
-      {/* Botón Eliminar (Columna 1) */}
+      {/* Eliminar */}
       <div className="flex justify-end w-full sm:w-auto sm:col-span-1">
         <Button
           type="button"
-          variant="danger"
+          variant="ghost"
           size="sm"
           disabled={updating}
           onClick={handleRemove}
-          className="w-full sm:w-auto text-center"
+          className="text-error hover:bg-red-50"
+          title="Eliminar producto"
         >
-          Eliminar
+          <Trash2 size={18} />
         </Button>
       </div>
     </div>
