@@ -6,6 +6,7 @@ import { User } from '@/models/user.model';
 import { AuthGuard } from '@/guards/AuthGuard';
 import { Spinner } from '@/components/ui/Spinner';
 import { Badge } from '@/components/ui/Badge';
+import { User as UserIcon, Mail, Phone, Shield, MapPin } from 'lucide-react';
 
 export default function ProfilePage() {
   const [profile, setProfile] = useState<User | null>(null);
@@ -58,21 +59,29 @@ export default function ProfilePage() {
               </h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
                 <div>
-                  <span className="block text-xs text-foreground-muted mb-1">Nombre Completo</span>
+                  <span className="flex items-center gap-1.5 text-xs text-foreground-muted mb-1">
+                    <UserIcon size={14} /> Nombre Completo
+                  </span>
                   <span className="font-semibold text-foreground">
                     {profile.firstName} {profile.lastName}
                   </span>
                 </div>
                 <div>
-                  <span className="block text-xs text-foreground-muted mb-1">Correo Electrónico</span>
+                  <span className="flex items-center gap-1.5 text-xs text-foreground-muted mb-1">
+                    <Mail size={14} /> Correo Electrónico
+                  </span>
                   <span className="font-semibold text-foreground">{profile.email}</span>
                 </div>
                 <div>
-                  <span className="block text-xs text-foreground-muted mb-1">Teléfono</span>
+                  <span className="flex items-center gap-1.5 text-xs text-foreground-muted mb-1">
+                    <Phone size={14} /> Teléfono
+                  </span>
                   <span className="font-semibold text-foreground">{profile.mobile || 'No registrado'}</span>
                 </div>
                 <div>
-                  <span className="block text-xs text-foreground-muted mb-1">Rol</span>
+                  <span className="flex items-center gap-1.5 text-xs text-foreground-muted mb-1">
+                    <Shield size={14} /> Rol
+                  </span>
                   <Badge variant={profile.role === 'ROLE_ADMIN' ? 'danger' : 'default'}>
                     {profile.role === 'ROLE_ADMIN' ? 'Administrador' : 'Cliente'}
                   </Badge>
@@ -94,14 +103,19 @@ export default function ProfilePage() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {profile.addresses.map((address) => (
                     <div key={address.id} className="border border-border rounded-xl p-4 text-sm space-y-1">
-                      <p className="font-semibold text-foreground">
-                        {address.firstName} {address.lastName}
-                      </p>
-                      <p className="text-foreground-muted">{address.streetAddress}</p>
-                      <p className="text-foreground-muted">
-                        {address.city}, {address.state} — {address.zipCode}
-                      </p>
-                      <p className="text-foreground-muted">{address.mobile}</p>
+                      <div className="flex items-start gap-3">
+                        <MapPin size={18} className="text-accent mt-0.5 flex-shrink-0" />
+                        <div>
+                          <p className="font-semibold text-foreground">
+                            {address.firstName} {address.lastName}
+                          </p>
+                          <p className="text-foreground-muted">{address.streetAddress}</p>
+                          <p className="text-foreground-muted">
+                            {address.city}, {address.state} — {address.zipCode}
+                          </p>
+                          <p className="text-foreground-muted">{address.mobile}</p>
+                        </div>
+                      </div>
                     </div>
                   ))}
                 </div>
