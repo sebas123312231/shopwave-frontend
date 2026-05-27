@@ -61,7 +61,7 @@ export default function ProductDetailPage() {
   }, [ratings]);
 
   return (
-    <div className="max-w-7xl mx-auto">
+    <div className="max-w-7xl mx-auto px-4 md:px-8 py-6 md:py-8">
       <Link
         href="/products"
         className="inline-flex items-center gap-2 text-sm font-semibold text-accent hover:text-accent-dark transition-colors mb-6"

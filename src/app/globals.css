@@ -51,16 +51,18 @@
   to { opacity: 1; transform: scale(1); }
 }
 
-body {
-  background: var(--color-background);
-  color: var(--color-foreground);
-  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
-}
+@layer base {
+  body {
+    background: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+  }
 
-a {
-  color: var(--color-accent);
-}
+  a {
+    color: var(--color-accent);
+  }
 
-a:hover {
-  color: var(--color-accent-dark);
+  a:hover {
+    color: var(--color-accent-dark);
+  }
 }

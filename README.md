@@ -211,6 +211,42 @@ Si necesitas usar inteligencia artificial (ChatGPT, Copilot, Claude, etc.) para 
 
 ---
 
+## Pruebas con Postman
+
+El archivo `ShopWave.postman_collection.json` en la raíz del proyecto contiene la colección completa de endpoints para probar la API con Postman.
+
+### Pasos para importar y usar
+
+1. Abrir Postman y hacer clic en **Import**
+2. Seleccionar el archivo `ShopWave.postman_collection.json`
+3. En la colección importada, ir a **Variables** y verificar que `base_url` apunte a `http://localhost:8080`
+4. Ejecutar primero **Auth → Inicio de sesión (Login)** — el script de test guarda el JWT automáticamente en la variable `{{jwt_token}}`
+5. El resto de los requests protegidos usarán `{{jwt_token}}` automáticamente
+
+### Endpoints incluidos
+
+| Módulo | Método | Endpoint | Auth |
+|--------|--------|----------|------|
+| Auth | POST | `/auth/signup` | No |
+| Auth | GET | `/auth/signin` | Basic |
+| Productos | GET | `/products` | No |
+| Productos | GET | `/products/all` | No |
+| Productos | GET | `/products/:id` | No |
+| Productos | GET | `/products/products/search` | No |
+| Reseñas | GET | `/reviews/product/:id` | No |
+| Reseñas | POST | `/reviews/create` | JWT |
+| Calificaciones | GET | `/ratings/product/:id` | No |
+| Calificaciones | POST | `/ratings/create` | JWT |
+| Carrito | GET | `/cart` | JWT |
+| Carrito | PUT | `/cart/add` | JWT |
+| Órdenes | POST | `/orders` | JWT |
+| Órdenes | GET | `/orders/user` | JWT |
+| Órdenes | GET | `/orders/:id` | JWT |
+| Usuarios | GET | `/users/profile` | JWT |
+| Admin | POST | `/admin/products/` | JWT (Admin) |
+
+---
+
 ## Troubleshooting
 
 ### Error "Cannot read properties of undefined (reading 'map')"
