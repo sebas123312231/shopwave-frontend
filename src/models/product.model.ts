@@ -46,3 +46,19 @@ export interface Review {
   product: Product;
   createdAt: string;
 }
+
+export interface CreateProductRequest {
+  title: string;
+  description: string;
+  price: number;
+  discountedPrice: number;
+  discountPersent: number;
+  quantity: number;
+  brand: string;
+  color: string;
+  size: Size[];
+  imageUrl: string;
+  topLevelCategory: string;
+  secondLevelCategory: string;
+  thirdLevelCategory: string;
+}
