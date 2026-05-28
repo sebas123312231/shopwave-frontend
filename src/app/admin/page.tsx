@@ -126,10 +126,10 @@ export default function AdminPage() {
 
   return (
     <AdminGuard>
-    <div className="max-w-6xl mx-auto">
+    <div className="max-w-6xl mx-auto px-4 md:px-8 py-6 md:py-8">
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-foreground tracking-tight">Panel de Administración</h1>
-        <p className="mt-2 text-foreground-muted">Gestiona productos, órdenes y monitorea el rendimiento de tu tienda.</p>
+        <p className="mt-2 text-foreground-muted">Gestiona productos y monitorea el rendimiento de tu tienda.</p>
       </div>
 
       {error && (
@@ -161,7 +161,7 @@ export default function AdminPage() {
             ))}
           </div>
 
-          <div className="grid gap-6 lg:grid-cols-2">
+          <div className="grid gap-6">
             <div className="rounded-2xl bg-white border border-border shadow-sm p-6 animate-slideUp animation-delay-200">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-lg font-bold text-foreground">Acciones rápidas</h2>
@@ -173,16 +173,18 @@ export default function AdminPage() {
                     Gestionar Productos
                   </Button>
                 </Link>
-                <Link href="/admin/orders">
+                {/* Órdenes: oculto para esta entrega */}
+                {/* <Link href="/admin/orders">
                   <Button variant="secondary" className="w-full justify-start">
                     <ClipboardList size={18} />
                     Ver Órdenes
                   </Button>
-                </Link>
+                </Link> */}
               </div>
             </div>
 
-            <div className="rounded-2xl bg-white border border-border shadow-sm p-6 animate-slideUp animation-delay-300">
+            {/* Órdenes recientes: oculto para esta entrega */}
+            {/* <div className="rounded-2xl bg-white border border-border shadow-sm p-6 animate-slideUp animation-delay-300">
               <h2 className="text-lg font-bold text-foreground mb-4">Órdenes recientes</h2>
               {recentOrders.length > 0 ? (
                 <div className="space-y-3">
@@ -201,7 +203,7 @@ export default function AdminPage() {
               ) : (
                 <p className="text-sm text-foreground-muted">No hay órdenes recientes</p>
               )}
-            </div>
+            </div> */}
           </div>
         </>
       )}

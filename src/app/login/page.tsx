@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { AuthService } from '@/services/auth.service';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
-import { LogIn, Package } from 'lucide-react';
+import { LogIn, Package, CheckCircle } from 'lucide-react';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -28,7 +28,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-[90vh]">
+    <div className="flex min-h-screen">
       <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-primary via-primary-light to-primary items-center justify-center p-12">
         <div className="max-w-md text-center space-y-6 animate-slideInLeft">
           <div className="flex justify-center">
@@ -38,20 +38,20 @@ export default function LoginPage() {
           </div>
           <h2 className="text-3xl font-bold text-white">Bienvenido a ShopWave</h2>
           <p className="text-white/70">
-            Accede a tu cuenta para gestionar tus pedidos, carrito de compras y más.
+            Accede a tu cuenta y descubre un catálogo curado con la mejor experiencia de compra.
           </p>
-          <div className="flex justify-center gap-4 text-sm text-white/50">
-            <span className="flex items-center gap-1">
-              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-              </svg>
-              Gestión de pedidos
+          <div className="flex flex-col gap-3 text-sm text-white/50">
+            <span className="flex items-center justify-center gap-2">
+              <CheckCircle size={16} className="text-accent-light" />
+              Catálogo completo de productos
             </span>
-            <span className="flex items-center gap-1">
-              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-              </svg>
-              Carrito persistente
+            <span className="flex items-center justify-center gap-2">
+              <CheckCircle size={16} className="text-accent-light" />
+              Experiencia de compra moderna
+            </span>
+            <span className="flex items-center justify-center gap-2">
+              <CheckCircle size={16} className="text-accent-light" />
+              Detalle visual de cada producto
             </span>
           </div>
         </div>

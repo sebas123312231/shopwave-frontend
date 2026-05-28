@@ -50,7 +50,8 @@ export const Sidebar = () => {
   const allItems: NavItem[] = [
     { label: 'Inicio', href: '/', icon: <Home size={20} /> },
     { label: 'Productos', href: '/products', icon: <Package size={20} /> },
-    { label: 'Mis Órdenes', href: '/orders', icon: <ClipboardList size={20} />, requiresAuth: true },
+    // Órdenes: oculto para esta entrega
+    // { label: 'Mis Órdenes', href: '/orders', icon: <ClipboardList size={20} />, requiresAuth: true },
     // Carrito: en desarrollo — ver src/app/cart/page.tsx y src/components/cart/
     // { label: 'Carrito', href: '/cart', icon: <ShoppingCart size={20} />, requiresAuth: true },
     { label: 'Perfil', href: '/profile', icon: <User size={20} />, requiresAuth: true },

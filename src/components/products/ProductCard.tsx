@@ -11,7 +11,7 @@ export const ProductCard = ({ product }: ProductCardProps) => {
   return (
     <Link
       href={`/products/${product.id}`}
-      className="group rounded-2xl bg-white shadow-sm border border-transparent hover:shadow-xl hover:scale-[1.02] hover:border-blue-100 transition-all duration-300 overflow-hidden"
+      className="group rounded-2xl bg-white shadow-sm border border-transparent hover:shadow-xl hover:scale-[1.02] hover:border-blue-100 transition-all duration-300 overflow-hidden flex flex-col"
     >
       <div className="relative aspect-[4/3] overflow-hidden bg-background-alt">
         <img
@@ -27,11 +27,11 @@ export const ProductCard = ({ product }: ProductCardProps) => {
         )}
       </div>
 
-      <div className="p-4 space-y-2">
+      <div className="p-4 flex flex-col flex-1">
         <p className="text-xs uppercase tracking-wider text-foreground-muted font-medium">{product.brand}</p>
-        <h3 className="line-clamp-2 text-base font-semibold text-foreground leading-snug">{product.title}</h3>
+        <h3 className="line-clamp-2 text-base font-semibold text-foreground leading-snug mt-2">{product.title}</h3>
 
-        <div className="flex items-baseline gap-2 pt-1">
+        <div className="flex items-baseline gap-2 pt-1 mt-auto">
           <span className="text-lg font-bold text-accent">{formatPrice(product.discountedPrice)}</span>
           {product.discountPersent > 0 && (
             <span className="text-sm text-foreground-muted line-through">{formatPrice(product.price)}</span>

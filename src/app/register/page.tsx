@@ -41,7 +41,7 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="flex min-h-[90vh]">
+    <div className="flex min-h-screen">
       <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-primary via-primary-light to-primary items-center justify-center p-12">
         <div className="max-w-md text-center space-y-6 animate-slideInLeft">
           <div className="flex justify-center">
@@ -56,15 +56,15 @@ export default function RegisterPage() {
           <div className="flex flex-col gap-3 text-sm text-white/50">
             <span className="flex items-center justify-center gap-2">
               <CheckCircle size={16} className="text-accent-light" />
-              Acceso a carrito persistente
+              Explora un catálogo curado
             </span>
             <span className="flex items-center justify-center gap-2">
               <CheckCircle size={16} className="text-accent-light" />
-              Historial de órdenes
+              Experiencia visual premium
             </span>
             <span className="flex items-center justify-center gap-2">
               <CheckCircle size={16} className="text-accent-light" />
-              Calificaciones y reseñas
+              Compra moderna y eficiente
             </span>
           </div>
         </div>
