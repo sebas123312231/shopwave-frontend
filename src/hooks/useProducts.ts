@@ -81,6 +81,7 @@ export const useProducts = ({ initialFilters }: UseProductsOptions = {}) => {
   }, [filters, debouncedSearch]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchProducts();
   }, [fetchProducts, serializedFilters, debouncedSearch]);
 
