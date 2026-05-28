@@ -18,7 +18,7 @@ export default function HomePage() {
     const fetchProducts = async () => {
       try {
         const data = await ProductService.getProducts(0, 8);
-        setProducts(data?.content ?? []);
+        setProducts(data ?? []);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Error al cargar productos');
         setProducts([]);
