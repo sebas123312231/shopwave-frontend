@@ -33,11 +33,10 @@ export default function OrdersPage() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [initStarted, setInitStarted] = useState(false);
+  const [initStarted] = useState(true);
   const router = useRouter();
 
   useEffect(() => {
-    setInitStarted(true);
     const loadOrders = async () => {
       try {
         setLoading(true);
