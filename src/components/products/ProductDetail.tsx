@@ -3,7 +3,6 @@ import { useMemo } from 'react';
 import { Product } from '@/models/product.model';
 import { formatPrice } from '@/utils/currency.util';
 import { Badge } from '@/components/ui/Badge';
-import { Star } from 'lucide-react';
 
 interface ProductDetailProps {
   product: Product;
@@ -11,21 +10,11 @@ interface ProductDetailProps {
   ratingsCount: number;
 }
 
-export const ProductDetail = ({ product, averageRating, ratingsCount }: ProductDetailProps) => {
+export const ProductDetail = ({ product }: ProductDetailProps) => {
   const availableSizes = useMemo(
     () => product.sizes?.filter((size) => size.quantity > 0).map((size) => size.name) ?? [],
     [product.sizes],
   );
-
-  const renderStars = (rating: number) => {
-    return Array.from({ length: 5 }, (_, i) => (
-      <Star
-        key={i}
-        size={16}
-        className={i < Math.round(rating) ? 'fill-accent text-accent' : 'text-border'}
-      />
-    ));
-  };
 
   return (
     <section className="grid gap-10 lg:grid-cols-[3fr_4fr]">

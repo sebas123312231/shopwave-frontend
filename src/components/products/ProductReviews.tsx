@@ -6,7 +6,6 @@ import { ReviewService } from '@/services/review.service';
 import { RatingService } from '@/services/rating.service';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/Input';
 import { Star, CheckCircle, AlertCircle, LogIn } from 'lucide-react';
 
 interface ProductReviewsProps {

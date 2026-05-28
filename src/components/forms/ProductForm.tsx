@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { Plus, X } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
-import { Product, CreateProductRequest, Size } from '@/models/product.model';
+import { Product, CreateProductRequest } from '@/models/product.model';
 
 interface ProductFormProps {
   mode: 'create' | 'edit';
@@ -41,12 +41,32 @@ export const ProductForm = ({
   onCancel,
   isLoading = false,
 }: ProductFormProps) => {
-  const [formData, setFormData] = useState<CreateProductRequest>(defaultFormData);
+  const [formData, setFormData] = useState<CreateProductRequest>(() => {
+    if (initialData && mode === 'edit') {
+      return {
+        title: initialData.title,
+        description: initialData.description,
+        price: initialData.price,
+        discountedPrice: initialData.discountedPrice,
+        discountPersent: initialData.discountPersent,
+        quantity: initialData.quantity,
+        brand: initialData.brand,
+        color: initialData.color,
+        size: initialData.sizes || [],
+        imageUrl: initialData.imageUrl,
+        topLevelCategory: initialData.category?.parentCategory?.parentCategory?.name || '',
+        secondLevelCategory: initialData.category?.parentCategory?.name || '',
+        thirdLevelCategory: initialData.category?.name || '',
+      };
+    }
+    return defaultFormData;
+  });
   const [errors, setErrors] = useState<FormErrors>({});
   const [newSize, setNewSize] = useState<{ name: string; quantity: number }>({ name: '', quantity: 0 });
 
   useEffect(() => {
     if (initialData && mode === 'edit') {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setFormData({
         title: initialData.title,
         description: initialData.description,

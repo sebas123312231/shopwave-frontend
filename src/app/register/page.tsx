@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { AuthService } from '@/services/auth.service';
 import { RegisterRequest } from '@/models/auth.model';
@@ -10,7 +9,6 @@ import { Button } from '@/components/ui/Button';
 import { UserPlus, Package, CheckCircle } from 'lucide-react';
 
 export default function RegisterPage() {
-  const router = useRouter();
   const [formData, setFormData] = useState<RegisterRequest>({
     firstName: '',
     lastName: '',
