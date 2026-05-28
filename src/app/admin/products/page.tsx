@@ -1,28 +1,91 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
-import { Plus, Edit, Trash2, Search, ChevronLeft, ChevronRight } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { Plus, Edit, Trash2, Search } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
-
-const mockProducts = [
-  { id: 1, title: 'Zapatillas Nike Air Max 270', brand: 'Nike', price: 129.99, stock: 45, category: 'Calzado', image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=100' },
-  { id: 2, title: 'Reloj Inteligente Series 5', brand: 'Apple', price: 299.99, stock: 28, category: 'Electrónica', image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=100' },
-  { id: 3, title: 'Campera Impermeable TNF', brand: 'The North Face', price: 189.99, stock: 12, category: 'Indumentaria', image: 'https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=100' },
-  { id: 4, title: 'Auriculares Sony WH-1000XM4', brand: 'Sony', price: 249.99, stock: 0, category: 'Electrónica', image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d6e1?w=100' },
-  { id: 5, title: 'Mochila Urban 30L', brand: 'Herschel', price: 79.99, stock: 63, category: 'Accesorios', image: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=100' },
-];
+import { Spinner } from '@/components/ui/Spinner';
+import { Modal } from '@/components/ui/Modal';
+import { AdminGuard } from '@/guards/AdminGuard';
+import { AdminProductService } from '@/services/admin-product.service';
+import { Product } from '@/models/product.model';
+import { formatPrice } from '@/utils/currency.util';
 
 export default function AdminProductsPage() {
+  const router = useRouter();
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [deleteModal, setDeleteModal] = useState<{ isOpen: boolean; product: Product | null }>({
+    isOpen: false,
+    product: null,
+  });
+  const [deleting, setDeleting] = useState(false);
 
-  const filteredProducts = mockProducts.filter((p) =>
+  const fetchProducts = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const data = await AdminProductService.getAll();
+      setProducts(data);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Error al cargar productos');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    let mounted = true;
+    const load = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const data = await AdminProductService.getAll();
+        if (mounted) setProducts(data);
+      } catch (err: unknown) {
+        if (mounted) setError(err instanceof Error ? err.message : 'Error al cargar productos');
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    };
+    load();
+    return () => { mounted = false; };
+  }, []);
+
+  useEffect(() => {
+    const handleFocus = () => {
+      fetchProducts();
+    };
+    window.addEventListener('focus', handleFocus);
+    return () => window.removeEventListener('focus', handleFocus);
+  }, [fetchProducts]);
+
+  const handleDelete = async () => {
+    if (!deleteModal.product) return;
+
+    try {
+      setDeleting(true);
+      await AdminProductService.delete(deleteModal.product.id);
+      setProducts((prev) => prev.filter((p) => p.id !== deleteModal.product!.id));
+      setDeleteModal({ isOpen: false, product: null });
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Error al eliminar producto');
+    } finally {
+      setDeleting(false);
+    }
+  };
+
+  const filteredProducts = products.filter((p) =>
     p.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
     p.brand.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
+    <AdminGuard>
     <div className="max-w-7xl mx-auto">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
         <div>
@@ -36,6 +99,12 @@ export default function AdminProductsPage() {
           </Button>
         </Link>
       </div>
+
+      {error && (
+        <div className="mb-6 p-4 rounded-xl bg-error/10 border border-error/20 text-error text-sm">
+          {error}
+        </div>
+      )}
 
       <div className="rounded-2xl bg-white border border-border shadow-sm mb-6">
         <div className="p-4 border-b border-border">
@@ -51,65 +120,87 @@ export default function AdminProductsPage() {
           </div>
         </div>
 
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead>
-              <tr className="border-b border-border bg-background-alt">
-                <th className="text-left text-xs font-semibold text-foreground-muted uppercase tracking-wider px-4 py-3">Producto</th>
-                <th className="text-left text-xs font-semibold text-foreground-muted uppercase tracking-wider px-4 py-3 hidden md:table-cell">Marca</th>
-                <th className="text-left text-xs font-semibold text-foreground-muted uppercase tracking-wider px-4 py-3">Precio</th>
-                <th className="text-left text-xs font-semibold text-foreground-muted uppercase tracking-wider px-4 py-3">Stock</th>
-                <th className="text-left text-xs font-semibold text-foreground-muted uppercase tracking-wider px-4 py-3 hidden lg:table-cell">Categoría</th>
-                <th className="text-right text-xs font-semibold text-foreground-muted uppercase tracking-wider px-4 py-3">Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredProducts.map((product) => (
-                <tr key={product.id} className="border-b border-border hover:bg-background-alt transition-colors">
-                  <td className="px-4 py-3">
-                    <div className="flex items-center gap-3">
-                      <img src={product.image} alt={product.title} className="h-10 w-10 rounded-lg object-cover" />
-                      <span className="font-medium text-foreground">{product.title}</span>
-                    </div>
-                  </td>
-                  <td className="px-4 py-3 text-sm text-foreground-muted hidden md:table-cell">{product.brand}</td>
-                  <td className="px-4 py-3 font-semibold text-accent">${product.price.toFixed(2)}</td>
-                  <td className="px-4 py-3">
-                    {product.stock > 0 ? (
-                      <Badge variant="success">{product.stock} unidades</Badge>
-                    ) : (
-                      <Badge variant="danger">Sin stock</Badge>
-                    )}
-                  </td>
-                  <td className="px-4 py-3 text-sm text-foreground-muted hidden lg:table-cell">{product.category}</td>
-                  <td className="px-4 py-3">
-                    <div className="flex items-center justify-end gap-2">
-                      <button className="p-2 rounded-lg hover:bg-accent/10 text-accent transition-colors">
-                        <Edit size={16} />
-                      </button>
-                      <button className="p-2 rounded-lg hover:bg-red-50 text-error transition-colors">
-                        <Trash2 size={16} />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-
-        <div className="flex items-center justify-between px-4 py-3 border-t border-border">
-          <p className="text-sm text-foreground-muted">Mostrando 1-5 de 247 productos</p>
-          <div className="flex gap-2">
-            <Button variant="secondary" size="sm" disabled>
-              <ChevronLeft size={16} />
-            </Button>
-            <Button variant="secondary" size="sm">
-              <ChevronRight size={16} />
-            </Button>
+        {loading ? (
+          <div className="flex justify-center py-12">
+            <Spinner size="lg" />
           </div>
-        </div>
+        ) : filteredProducts.length === 0 ? (
+          <div className="text-center py-12">
+            <p className="text-foreground-muted">No se encontraron productos</p>
+          </div>
+        ) : (
+          <>
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-border bg-background-alt">
+                    <th className="text-left text-xs font-semibold text-foreground-muted uppercase tracking-wider px-4 py-3">Producto</th>
+                    <th className="text-left text-xs font-semibold text-foreground-muted uppercase tracking-wider px-4 py-3 hidden md:table-cell">Marca</th>
+                    <th className="text-left text-xs font-semibold text-foreground-muted uppercase tracking-wider px-4 py-3">Precio</th>
+                    <th className="text-left text-xs font-semibold text-foreground-muted uppercase tracking-wider px-4 py-3">Stock</th>
+                    <th className="text-left text-xs font-semibold text-foreground-muted uppercase tracking-wider px-4 py-3 hidden lg:table-cell">Categoría</th>
+                    <th className="text-right text-xs font-semibold text-foreground-muted uppercase tracking-wider px-4 py-3">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredProducts.map((product) => (
+                    <tr key={product.id} className="border-b border-border hover:bg-background-alt transition-colors">
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-3">
+                          <img src={product.imageUrl} alt={product.title} className="h-10 w-10 rounded-lg object-cover" />
+                          <span className="font-medium text-foreground">{product.title}</span>
+                        </div>
+                      </td>
+                      <td className="px-4 py-3 text-sm text-foreground-muted hidden md:table-cell">{product.brand}</td>
+                      <td className="px-4 py-3 font-semibold text-accent">{formatPrice(product.price)}</td>
+                      <td className="px-4 py-3">
+                        {product.quantity > 0 ? (
+                          <Badge variant="success">{product.quantity} unidades</Badge>
+                        ) : (
+                          <Badge variant="danger">Sin stock</Badge>
+                        )}
+                      </td>
+                      <td className="px-4 py-3 text-sm text-foreground-muted hidden lg:table-cell">{product.category?.name || '-'}</td>
+                      <td className="px-4 py-3">
+                        <div className="flex items-center justify-end gap-2">
+                          <button
+                            onClick={() => router.push(`/admin/products/edit/${product.id}`)}
+                            className="p-2 rounded-lg hover:bg-accent/10 text-accent transition-colors"
+                          >
+                            <Edit size={16} />
+                          </button>
+                          <button
+                            onClick={() => setDeleteModal({ isOpen: true, product })}
+                            className="p-2 rounded-lg hover:bg-red-50 text-error transition-colors"
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            <div className="flex items-center justify-between px-4 py-3 border-t border-border">
+              <p className="text-sm text-foreground-muted">Mostrando {filteredProducts.length} de {products.length} productos</p>
+            </div>
+          </>
+        )}
       </div>
+
+      <Modal
+        isOpen={deleteModal.isOpen}
+        onClose={() => setDeleteModal({ isOpen: false, product: null })}
+        onConfirm={handleDelete}
+        title="Eliminar producto"
+        message={`¿Estás seguro de que deseas eliminar "${deleteModal.product?.title}"? Esta acción no se puede deshacer.`}
+        confirmText="Eliminar"
+        variant="danger"
+        isLoading={deleting}
+      />
     </div>
+    </AdminGuard>
   );
 }

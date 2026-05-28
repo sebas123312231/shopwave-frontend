@@ -1,87 +1,211 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { Package, ClipboardList, TrendingUp, AlertCircle } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/Button';
+import { Spinner } from '@/components/ui/Spinner';
+import { AdminGuard } from '@/guards/AdminGuard';
+import { AdminProductService } from '@/services/admin-product.service';
+import { AdminOrderService } from '@/services/admin-order.service';
+import { Product } from '@/models/product.model';
+import { Order } from '@/models/order.model';
+import { formatPrice } from '@/utils/currency.util';
 
-const stats = [
-  { label: 'Total Productos', value: '247', icon: <Package size={24} />, trend: '+12 este mes', color: 'accent' },
-  { label: 'Órdenes Totales', value: '1,849', icon: <ClipboardList size={24} />, trend: '+89 esta semana', color: 'success' },
-  { label: 'Ingresos Mensuales', value: '$48,290', icon: <TrendingUp size={24} />, trend: '+18% vs mes anterior', color: 'accent' },
-  { label: 'Órdenes Pendientes', value: '23', icon: <AlertCircle size={24} />, trend: 'Requieren atención', color: 'warning' },
-];
+interface DashboardStats {
+  totalProducts: number;
+  totalOrders: number;
+  pendingOrders: number;
+  monthlyRevenue: number;
+}
 
 export default function AdminPage() {
+  const [stats, setStats] = useState<DashboardStats>({
+    totalProducts: 0,
+    totalOrders: 0,
+    pendingOrders: 0,
+    monthlyRevenue: 0,
+  });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [recentOrders, setRecentOrders] = useState<Array<{ id: string; status: string; time: string }>>([]);
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        let products: Product[] = [];
+        let orders: Order[] = [];
+
+        try {
+          products = await AdminProductService.getAll();
+        } catch (err) {
+          console.error('Error loading products:', err);
+        }
+
+        try {
+          orders = await AdminOrderService.getAll();
+        } catch (err) {
+          console.error('Error loading orders:', err);
+        }
+
+        const pendingOrders = orders.filter(
+          (o) => o.orderStatus === 'PLACED' || o.orderStatus === 'PENDING'
+        ).length;
+
+        const currentMonth = new Date().getMonth();
+        const currentYear = new Date().getFullYear();
+        const monthlyRevenue = orders
+          .filter((o) => {
+            const orderDate = new Date(o.orderDate);
+            return (
+              o.orderStatus === 'DELIVERED' &&
+              orderDate.getMonth() === currentMonth &&
+              orderDate.getFullYear() === currentYear
+            );
+          })
+          .reduce((sum, o) => sum + o.totalPrice, 0);
+
+        setStats({
+          totalProducts: products.length,
+          totalOrders: orders.length,
+          pendingOrders,
+          monthlyRevenue,
+        });
+
+        const recent = orders
+          .slice(0, 3)
+          .map((o) => ({
+            id: o.orderId || `#${o.id}`,
+            status: o.orderStatus,
+            time: new Date(o.orderDate).toLocaleDateString('es-ES'),
+          }));
+        setRecentOrders(recent);
+      } catch (err: unknown) {
+        setError(err instanceof Error ? err.message : 'Error al cargar estadísticas');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchStats();
+  }, []);
+
+  const statsCards = [
+    { label: 'Total Productos', value: stats.totalProducts.toString(), icon: <Package size={24} />, trend: 'Productos en catálogo', color: 'accent' },
+    { label: 'Órdenes Totales', value: stats.totalOrders.toString(), icon: <ClipboardList size={24} />, trend: 'Todas las órdenes', color: 'success' },
+    { label: 'Ingresos Mensuales', value: formatPrice(stats.monthlyRevenue), icon: <TrendingUp size={24} />, trend: 'Órdenes entregadas este mes', color: 'accent' },
+    { label: 'Órdenes Pendientes', value: stats.pendingOrders.toString(), icon: <AlertCircle size={24} />, trend: 'Requieren atención', color: 'warning' },
+  ];
+
+  const getStatusLabel = (status: string) => {
+    const labels: Record<string, string> = {
+      PLACED: 'Pendiente',
+      PENDING: 'Pendiente',
+      CONFIRMED: 'Confirmada',
+      SHIPPED: 'Enviada',
+      DELIVERED: 'Entregada',
+      CANCELLED: 'Cancelada',
+    };
+    return labels[status] || status;
+  };
+
+  const getStatusColor = (status: string) => {
+    const colors: Record<string, string> = {
+      PLACED: 'bg-amber-50 text-amber-700',
+      PENDING: 'bg-amber-50 text-amber-700',
+      CONFIRMED: 'bg-blue-50 text-blue-700',
+      SHIPPED: 'bg-purple-50 text-purple-700',
+      DELIVERED: 'bg-green-50 text-green-700',
+      CANCELLED: 'bg-red-50 text-red-700',
+    };
+    return colors[status] || 'bg-gray-50 text-gray-700';
+  };
+
   return (
+    <AdminGuard>
     <div className="max-w-6xl mx-auto">
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-foreground tracking-tight">Panel de Administración</h1>
         <p className="mt-2 text-foreground-muted">Gestiona productos, órdenes y monitorea el rendimiento de tu tienda.</p>
       </div>
 
-      <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4 mb-10">
-        {stats.map((stat, index) => (
-          <div
-            key={stat.label}
-            className="rounded-2xl bg-white border border-border shadow-sm p-6 hover:shadow-lg transition-shadow animate-slideUp"
-            style={{ animationDelay: `${index * 50}ms` }}
-          >
-            <div className={`h-12 w-12 rounded-xl flex items-center justify-center mb-4 bg-${stat.color}/10 text-${stat.color}`}>
-              {stat.icon}
-            </div>
-            <p className="text-sm text-foreground-muted font-medium">{stat.label}</p>
-            <p className="text-2xl font-bold text-foreground mt-1">{stat.value}</p>
-            <p className="text-xs text-foreground-muted mt-2">{stat.trend}</p>
-          </div>
-        ))}
-      </div>
-
-      <div className="grid gap-6 lg:grid-cols-2">
-        <div className="rounded-2xl bg-white border border-border shadow-sm p-6 animate-slideUp animation-delay-200">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-lg font-bold text-foreground">Acciones rápidas</h2>
-          </div>
-          <div className="flex flex-col gap-3">
-            <Link href="/admin/products">
-              <Button variant="secondary" className="w-full justify-start">
-                <Package size={18} />
-                Gestionar Productos
-              </Button>
-            </Link>
-            <Link href="/admin/orders">
-              <Button variant="secondary" className="w-full justify-start">
-                <ClipboardList size={18} />
-                Ver Órdenes
-              </Button>
-            </Link>
-          </div>
+      {error && (
+        <div className="mb-6 p-4 rounded-xl bg-error/10 border border-error/20 text-error text-sm">
+          {error}
         </div>
+      )}
 
-        <div className="rounded-2xl bg-white border border-border shadow-sm p-6 animate-slideUp animation-delay-300">
-          <h2 className="text-lg font-bold text-foreground mb-4">Órdenes recientes</h2>
-          <div className="space-y-3">
-            {[
-              { id: 'SW-2026-0534', status: 'Pendiente', time: 'Hace 5 min' },
-              { id: 'SW-2026-0533', status: 'Confirmada', time: 'Hace 23 min' },
-              { id: 'SW-2026-0532', status: 'Enviada', time: 'Hace 1 hora' },
-            ].map((order) => (
-              <div key={order.id} className="flex items-center justify-between py-2 border-b border-border last:border-0">
-                <div>
-                  <p className="text-sm font-semibold text-foreground">{order.id}</p>
-                  <p className="text-xs text-foreground-muted">{order.time}</p>
+      {loading ? (
+        <div className="flex justify-center py-12">
+          <Spinner size="lg" />
+        </div>
+      ) : (
+        <>
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4 mb-10">
+            {statsCards.map((stat, index) => (
+              <div
+                key={stat.label}
+                className="rounded-2xl bg-white border border-border shadow-sm p-6 hover:shadow-lg transition-shadow animate-slideUp"
+                style={{ animationDelay: `${index * 50}ms` }}
+              >
+                <div className={`h-12 w-12 rounded-xl flex items-center justify-center mb-4 bg-${stat.color}/10 text-${stat.color}`}>
+                  {stat.icon}
                 </div>
-                <span className={`text-xs font-medium px-2.5 py-1 rounded-full ${
-                  order.status === 'Pendiente' ? 'bg-amber-50 text-amber-700' :
-                  order.status === 'Confirmada' ? 'bg-blue-50 text-blue-700' :
-                  'bg-green-50 text-green-700'
-                }`}>
-                  {order.status}
-                </span>
+                <p className="text-sm text-foreground-muted font-medium">{stat.label}</p>
+                <p className="text-2xl font-bold text-foreground mt-1">{stat.value}</p>
+                <p className="text-xs text-foreground-muted mt-2">{stat.trend}</p>
               </div>
             ))}
           </div>
-        </div>
-      </div>
+
+          <div className="grid gap-6 lg:grid-cols-2">
+            <div className="rounded-2xl bg-white border border-border shadow-sm p-6 animate-slideUp animation-delay-200">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-lg font-bold text-foreground">Acciones rápidas</h2>
+              </div>
+              <div className="flex flex-col gap-3">
+                <Link href="/admin/products">
+                  <Button variant="secondary" className="w-full justify-start">
+                    <Package size={18} />
+                    Gestionar Productos
+                  </Button>
+                </Link>
+                <Link href="/admin/orders">
+                  <Button variant="secondary" className="w-full justify-start">
+                    <ClipboardList size={18} />
+                    Ver Órdenes
+                  </Button>
+                </Link>
+              </div>
+            </div>
+
+            <div className="rounded-2xl bg-white border border-border shadow-sm p-6 animate-slideUp animation-delay-300">
+              <h2 className="text-lg font-bold text-foreground mb-4">Órdenes recientes</h2>
+              {recentOrders.length > 0 ? (
+                <div className="space-y-3">
+                  {recentOrders.map((order) => (
+                    <div key={order.id} className="flex items-center justify-between py-2 border-b border-border last:border-0">
+                      <div>
+                        <p className="text-sm font-semibold text-foreground">{order.id}</p>
+                        <p className="text-xs text-foreground-muted">{order.time}</p>
+                      </div>
+                      <span className={`text-xs font-medium px-2.5 py-1 rounded-full ${getStatusColor(order.status)}`}>
+                        {getStatusLabel(order.status)}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-sm text-foreground-muted">No hay órdenes recientes</p>
+              )}
+            </div>
+          </div>
+        </>
+      )}
     </div>
+    </AdminGuard>
   );
 }
