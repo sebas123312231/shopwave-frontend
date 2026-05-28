@@ -39,15 +39,6 @@ export const ProductDetail = ({ product, averageRating, ratingsCount }: ProductD
           <h1 className="text-3xl md:text-4xl font-bold text-foreground leading-tight tracking-tight">{product.title}</h1>
         </div>
 
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-1">
-            {renderStars(averageRating)}
-          </div>
-          <span className="text-sm text-foreground-muted">
-            {averageRating > 0 ? `${averageRating.toFixed(1)} / 5 (${ratingsCount} calificaciones)` : 'Sin calificaciones'}
-          </span>
-        </div>
-
         <div className="flex flex-wrap items-center gap-2">
           {product.discountPersent > 0 && <Badge variant="danger">-{product.discountPersent}%</Badge>}
           <Badge variant={product.quantity > 0 ? 'success' : 'warning'}>
