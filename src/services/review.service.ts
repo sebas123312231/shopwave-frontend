@@ -4,7 +4,7 @@ import { CreateReviewRequest } from '@/models/review.model';
 
 export const ReviewService = {
   getByProduct: async (productId: number): Promise<Review[]> => {
-    return api.get<Review[]>(`/reviews/product/${productId}`, false);
+    return api.get<Review[]>(`/reviews/product/${productId}`, true);
   },
 
   create: async (req: CreateReviewRequest): Promise<Review> => {
