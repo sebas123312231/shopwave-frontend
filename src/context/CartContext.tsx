@@ -82,7 +82,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     if (isAuthenticated && !prevAuthRef.current) {
       prevAuthRef.current = true;
       refreshCart();
-    } else if (!isAuthenticated) {
+    } else if (!isAuthenticated && prevAuthRef.current) {
       prevAuthRef.current = false;
       setCart(null);
       setLoading(false);

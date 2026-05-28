@@ -2,6 +2,70 @@ import { NextRequest, NextResponse } from 'next/server';
 
 const BACKEND_URL = process.env.BACKEND_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
 
+function cleanResponseBody(text: string): string {
+  let trimmed = text.trim();
+  if (!trimmed) return text;
+  
+  trimmed = trimmed.replace(/"hibernateLazyInitializer"\s*([}\]])/g, '"hibernateLazyInitializer":null$1');
+  
+  let startIndex = -1;
+  for (let i = 0; i < trimmed.length; i++) {
+    if (trimmed[i] === '[' || trimmed[i] === '{') {
+      startIndex = i;
+      break;
+    }
+  }
+  
+  if (startIndex === -1) return text;
+  
+  let depth = 0;
+  let inString = false;
+  let escapeNext = false;
+  let endIndex = trimmed.length;
+  
+  for (let i = startIndex; i < trimmed.length; i++) {
+    const char = trimmed[i];
+    
+    if (escapeNext) {
+      escapeNext = false;
+      continue;
+    }
+    
+    if (inString) {
+      if (char === '\\') {
+        escapeNext = true;
+      } else if (char === '"') {
+        inString = false;
+      }
+      continue;
+    }
+    
+    if (char === '"') {
+      inString = true;
+      continue;
+    }
+    
+    if (char === '[' || char === '{') {
+      depth++;
+    } else if (char === ']' || char === '}') {
+      depth--;
+      if (depth === 0) {
+        endIndex = i + 1;
+        break;
+      }
+    }
+  }
+  
+  const jsonPart = trimmed.slice(startIndex, endIndex);
+  
+  try {
+    JSON.parse(jsonPart);
+    return jsonPart;
+  } catch {
+    return text;
+  }
+}
+
 const HOP_BY_HOP = new Set([
   'host',
   'connection',
@@ -30,6 +94,7 @@ async function proxyRequest(request: NextRequest): Promise<NextResponse> {
   const init: RequestInit = {
     method: request.method,
     headers,
+    redirect: 'manual',
   };
 
   if (request.method !== 'GET' && request.method !== 'HEAD') {
@@ -38,6 +103,26 @@ async function proxyRequest(request: NextRequest): Promise<NextResponse> {
 
   try {
     const backendResponse = await fetch(targetUrl, init);
+    
+    // Handle 308 redirect manually to preserve Authorization header
+    if (backendResponse.status === 308 || backendResponse.status === 301 || backendResponse.status === 302) {
+      const location = backendResponse.headers.get('location');
+      if (location) {
+        const redirectResponse = await fetch(location, init);
+        const redirectHeaders = new Headers();
+        redirectResponse.headers.forEach((value, key) => {
+          if (key.toLowerCase() === 'www-authenticate') return;
+          redirectHeaders.set(key, value);
+        });
+        const bodyText = await redirectResponse.text();
+        const cleanedBody = cleanResponseBody(bodyText);
+        return new NextResponse(cleanedBody, {
+          status: redirectResponse.status,
+          statusText: redirectResponse.statusText,
+          headers: redirectHeaders,
+        });
+      }
+    }
 
     const responseHeaders = new Headers();
     backendResponse.headers.forEach((value, key) => {
@@ -45,7 +130,10 @@ async function proxyRequest(request: NextRequest): Promise<NextResponse> {
       responseHeaders.set(key, value);
     });
 
-    return new NextResponse(backendResponse.body, {
+    const bodyText = await backendResponse.text();
+    const cleanedBody = cleanResponseBody(bodyText);
+
+    return new NextResponse(cleanedBody, {
       status: backendResponse.status,
       statusText: backendResponse.statusText,
       headers: responseHeaders,

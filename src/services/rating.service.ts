@@ -4,7 +4,7 @@ import { CreateRatingRequest } from '@/models/rating.model';
 
 export const RatingService = {
   getByProduct: async (productId: number): Promise<Rating[]> => {
-    return api.get<Rating[]>(`/ratings/product/${productId}`, false);
+    return api.get<Rating[]>(`/ratings/product/${productId}`, true);
   },
 
   create: async (req: CreateRatingRequest): Promise<Rating> => {

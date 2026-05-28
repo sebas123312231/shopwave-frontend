@@ -36,7 +36,7 @@ export const Button = ({
       {...props}
     >
       {loading && <Spinner size="sm" />}
-      <span>{children}</span>
+      {children}
     </button>
   );
 };

@@ -1,0 +1,440 @@
+{
+  "info": {
+    "_postman_id": "shopwave-fusion-api",
+    "name": "ShopWave Fusion API",
+    "description": "Colección de pruebas para la API REST del backend ShopWave Fusion (Spring Boot). Base URL: http://localhost:8080",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8080",
+      "type": "string",
+      "description": "URL base del backend Spring Boot"
+    },
+    {
+      "key": "jwt_token",
+      "value": "",
+      "type": "string",
+      "description": "JWT obtenido al iniciar sesión. Se actualiza automáticamente con el script del request de Login."
+    }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "description": "Endpoints de autenticación: registro e inicio de sesión",
+      "item": [
+        {
+          "name": "Registro de usuario",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/auth/signup",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "signup"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"Juan\",\n  \"lastName\": \"Pérez\",\n  \"email\": \"juan.perez@example.com\",\n  \"password\": \"password123\",\n  \"mobile\": \"+591 70123456\"\n}"
+            },
+            "description": "Crea una nueva cuenta de usuario con rol ROLE_USER. No requiere autenticación."
+          },
+          "response": []
+        },
+        {
+          "name": "Inicio de sesión (Login)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Guardar el JWT automáticamente en la variable de colección",
+                  "const authHeader = pm.response.headers.get('Authorization');",
+                  "if (authHeader) {",
+                  "    const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : authHeader;",
+                  "    pm.collectionVariables.set('jwt_token', token);",
+                  "    console.log('Token JWT guardado correctamente');",
+                  "} else {",
+                  "    console.log('No se encontró header Authorization. Revisá el cuerpo de la respuesta.');",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Basic {{base64_credentials}}",
+                "description": "Usar Basic Auth con email:password en Base64. Ejemplo: juan.perez@example.com:password123"
+              }
+            ],
+            "auth": {
+              "type": "basic",
+              "basic": [
+                {
+                  "key": "username",
+                  "value": "juan.perez@example.com",
+                  "type": "string"
+                },
+                {
+                  "key": "password",
+                  "value": "password123",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/signin",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "signin"]
+            },
+            "description": "Autentica al usuario con Basic Auth (email:password en Base64). Devuelve el JWT en el header 'Authorization' de la respuesta. El script de Test guarda el token automáticamente en la variable {{jwt_token}}."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Productos",
+      "description": "Endpoints públicos y protegidos para consultar el catálogo de productos",
+      "item": [
+        {
+          "name": "Listar productos (paginado)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/products?page=0&size=8",
+              "host": ["{{base_url}}"],
+              "path": ["products"],
+              "query": [
+                { "key": "page", "value": "0", "description": "Número de página (base 0)" },
+                { "key": "size", "value": "8", "description": "Cantidad de productos por página" }
+              ]
+            },
+            "description": "Obtiene la lista de productos paginada. Endpoint público, no requiere JWT."
+          },
+          "response": []
+        },
+        {
+          "name": "Listar productos con filtros",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/products/all?pageNumber=0&pageSize=12&minDiscount=0",
+              "host": ["{{base_url}}"],
+              "path": ["products", "all"],
+              "query": [
+                { "key": "pageNumber", "value": "0" },
+                { "key": "pageSize", "value": "12" },
+                { "key": "minDiscount", "value": "0", "description": "Descuento mínimo (%)" },
+                { "key": "category", "value": "", "disabled": true, "description": "Ej: shoes, electronics" },
+                { "key": "minPrice", "value": "", "disabled": true, "description": "Precio mínimo" },
+                { "key": "maxPrice", "value": "", "disabled": true, "description": "Precio máximo" },
+                { "key": "sort", "value": "", "disabled": true, "description": "Ej: price_asc, price_desc" },
+                { "key": "stock", "value": "", "disabled": true, "description": "true = solo con stock" },
+                { "key": "colors", "value": "", "disabled": true, "description": "Colores separados por coma" },
+                { "key": "sizes", "value": "", "disabled": true, "description": "Tallas separadas por coma" }
+              ]
+            },
+            "description": "Obtiene productos con filtros avanzados: categoría, precio, descuento, stock, colores y tallas. Endpoint público."
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener producto por ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/products/1",
+              "host": ["{{base_url}}"],
+              "path": ["products", "1"]
+            },
+            "description": "Obtiene el detalle de un producto específico por su ID. Endpoint público."
+          },
+          "response": []
+        },
+        {
+          "name": "Buscar productos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/products/products/search?q=zapatillas",
+              "host": ["{{base_url}}"],
+              "path": ["products", "products", "search"],
+              "query": [
+                { "key": "q", "value": "zapatillas", "description": "Término de búsqueda" }
+              ]
+            },
+            "description": "Busca productos por nombre o descripción. Endpoint público."
+          },
+          "response": []
+        },
+        {
+          "name": "Productos por categoría",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/products/by-category?categoryName=shoes&page=0&pageSize=12",
+              "host": ["{{base_url}}"],
+              "path": ["products", "by-category"],
+              "query": [
+                { "key": "categoryName", "value": "shoes", "description": "Nombre de la categoría" },
+                { "key": "page", "value": "0" },
+                { "key": "pageSize", "value": "12" }
+              ]
+            },
+            "description": "Filtra productos por nombre de categoría. Endpoint público."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Reseñas",
+      "description": "Endpoints para consultar y crear reseñas de productos",
+      "item": [
+        {
+          "name": "Obtener reseñas de un producto",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/reviews/product/1",
+              "host": ["{{base_url}}"],
+              "path": ["reviews", "product", "1"]
+            },
+            "description": "Lista todas las reseñas de un producto por su ID. Endpoint público."
+          },
+          "response": []
+        },
+        {
+          "name": "Crear reseña",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "{{jwt_token}}", "description": "JWT obtenido al hacer Login" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/reviews/create",
+              "host": ["{{base_url}}"],
+              "path": ["reviews", "create"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"productId\": 1,\n  \"review\": \"Excelente producto, muy buena calidad y llegó antes de lo esperado.\"\n}"
+            },
+            "description": "Crea una nueva reseña para un producto. Requiere JWT en el header Authorization."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Calificaciones",
+      "description": "Endpoints para consultar y crear calificaciones (rating) de productos",
+      "item": [
+        {
+          "name": "Obtener calificaciones de un producto",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/ratings/product/1",
+              "host": ["{{base_url}}"],
+              "path": ["ratings", "product", "1"]
+            },
+            "description": "Lista todas las calificaciones de un producto por su ID. Endpoint público."
+          },
+          "response": []
+        },
+        {
+          "name": "Crear calificación",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "{{jwt_token}}", "description": "JWT obtenido al hacer Login" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/ratings/create",
+              "host": ["{{base_url}}"],
+              "path": ["ratings", "create"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"productId\": 1,\n  \"rating\": 5\n}"
+            },
+            "description": "Crea o actualiza la calificación de un producto (1-5 estrellas). Requiere JWT."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Carrito",
+      "description": "Endpoints para gestionar el carrito de compras del usuario autenticado",
+      "item": [
+        {
+          "name": "Obtener carrito del usuario",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "{{jwt_token}}", "description": "JWT obtenido al hacer Login" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/cart",
+              "host": ["{{base_url}}"],
+              "path": ["cart"]
+            },
+            "description": "Obtiene el carrito activo del usuario autenticado. Requiere JWT."
+          },
+          "response": []
+        },
+        {
+          "name": "Agregar producto al carrito",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "{{jwt_token}}", "description": "JWT obtenido al hacer Login" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/cart/add",
+              "host": ["{{base_url}}"],
+              "path": ["cart", "add"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"productId\": 1,\n  \"size\": \"M\",\n  \"quantity\": 1,\n  \"price\": 99.99\n}"
+            },
+            "description": "Agrega un ítem al carrito del usuario. Requiere JWT."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Órdenes",
+      "description": "Endpoints para crear y consultar órdenes del usuario autenticado",
+      "item": [
+        {
+          "name": "Crear orden",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "{{jwt_token}}", "description": "JWT obtenido al hacer Login" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/orders",
+              "host": ["{{base_url}}"],
+              "path": ["orders"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"Juan\",\n  \"lastName\": \"Pérez\",\n  \"streetAddress\": \"Av. 6 de Agosto 1234\",\n  \"city\": \"La Paz\",\n  \"state\": \"La Paz\",\n  \"zipCode\": \"0100\",\n  \"mobile\": \"+591 70123456\",\n  \"paymentMethod\": \"CREDIT_CARD\",\n  \"status\": \"PENDING\",\n  \"paymentId\": \"pay-1234567890\",\n  \"cardholderName\": \"Juan Pérez\",\n  \"cardNumber\": \"4111111111111111\"\n}"
+            },
+            "description": "Crea una nueva orden a partir del carrito activo del usuario. Requiere JWT."
+          },
+          "response": []
+        },
+        {
+          "name": "Listar órdenes del usuario",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "{{jwt_token}}", "description": "JWT obtenido al hacer Login" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/orders/user",
+              "host": ["{{base_url}}"],
+              "path": ["orders", "user"]
+            },
+            "description": "Lista todas las órdenes del usuario autenticado. Requiere JWT."
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener orden por ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "{{jwt_token}}", "description": "JWT obtenido al hacer Login" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/orders/1",
+              "host": ["{{base_url}}"],
+              "path": ["orders", "1"]
+            },
+            "description": "Obtiene el detalle de una orden específica por su ID. Requiere JWT."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Usuarios",
+      "description": "Endpoints para consultar información del perfil del usuario autenticado",
+      "item": [
+        {
+          "name": "Obtener perfil del usuario",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "{{jwt_token}}", "description": "JWT obtenido al hacer Login" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/users/profile",
+              "host": ["{{base_url}}"],
+              "path": ["users", "profile"]
+            },
+            "description": "Obtiene el perfil completo del usuario autenticado (nombre, email, direcciones, rol). Requiere JWT."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Admin - Productos",
+      "description": "Endpoints de administración para gestionar productos (requiere ROLE_ADMIN)",
+      "item": [
+        {
+          "name": "Crear producto (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "{{jwt_token}}", "description": "JWT de usuario con ROLE_ADMIN" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/admin/products/",
+              "host": ["{{base_url}}"],
+              "path": ["admin", "products", ""]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Zapatillas Running Pro\",\n  \"description\": \"Zapatillas de alto rendimiento para running\",\n  \"price\": 129.99,\n  \"discountedPrice\": 99.99,\n  \"discountPersent\": 23,\n  \"quantity\": 50,\n  \"brand\": \"Nike\",\n  \"color\": \"negro\",\n  \"imageUrl\": \"https://example.com/image.jpg\",\n  \"sizes\": [\n    { \"name\": \"38\", \"quantity\": 10 },\n    { \"name\": \"40\", \"quantity\": 20 },\n    { \"name\": \"42\", \"quantity\": 20 }\n  ],\n  \"category\": {\n    \"name\": \"Running\",\n    \"parentCategory\": { \"name\": \"Zapatillas\" },\n    \"level\": 2\n  }\n}"
+            },
+            "description": "Crea un nuevo producto en el catálogo. Requiere JWT con ROLE_ADMIN."
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

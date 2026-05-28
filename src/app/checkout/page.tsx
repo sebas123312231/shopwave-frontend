@@ -6,7 +6,6 @@ import { AuthGuard } from '@/guards/AuthGuard';
 import { AddressForm } from '@/components/forms/AddressForm';
 import { CheckoutForm } from '@/components/forms/CheckoutForm';
 import { Button } from '@/components/ui/Button';
-import { Spinner } from '@/components/ui/Spinner';
 import { useCart } from '@/hooks/useCart';
 import { OrderService } from '@/services/order.service';
 import { CreateOrderRequest, PaymentMethod, PaymentStatus } from '@/models/order.model';
