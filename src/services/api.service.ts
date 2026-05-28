@@ -2,6 +2,64 @@ import { getToken, removeToken, isTokenExpired } from '@/utils/token.util';
 
 const API_PREFIX = '/api';
 
+function parseJsonSafe(text: string): unknown {
+  let trimmed = text.trim();
+  if (!trimmed) return trimmed;
+
+  trimmed = trimmed.replace(/"hibernateLazyInitializer"\s*([}\]])/g, '"hibernateLazyInitializer":null$1');
+
+  let startIndex = -1;
+  for (let i = 0; i < trimmed.length; i++) {
+    if (trimmed[i] === '[' || trimmed[i] === '{') {
+      startIndex = i;
+      break;
+    }
+  }
+
+  if (startIndex === -1) return JSON.parse(trimmed);
+
+  let depth = 0;
+  let inString = false;
+  let escapeNext = false;
+  let endIndex = trimmed.length;
+
+  for (let i = startIndex; i < trimmed.length; i++) {
+    const char = trimmed[i];
+
+    if (escapeNext) {
+      escapeNext = false;
+      continue;
+    }
+
+    if (inString) {
+      if (char === '\\') {
+        escapeNext = true;
+      } else if (char === '"') {
+        inString = false;
+      }
+      continue;
+    }
+
+    if (char === '"') {
+      inString = true;
+      continue;
+    }
+
+    if (char === '[' || char === '{') {
+      depth++;
+    } else if (char === ']' || char === '}') {
+      depth--;
+      if (depth === 0) {
+        endIndex = i + 1;
+        break;
+      }
+    }
+  }
+
+  const jsonPart = trimmed.slice(startIndex, endIndex);
+  return JSON.parse(jsonPart);
+}
+
 async function handleResponse<T>(response: Response): Promise<T> {
   if (!response.ok) {
     if (response.status === 401) {
@@ -17,7 +75,8 @@ async function handleResponse<T>(response: Response): Promise<T> {
     throw new Error(error.message || `Error ${response.status}: ${response.statusText}`);
   }
   if (response.status === 204) return undefined as T;
-  return response.json() as Promise<T>;
+  const text = await response.text();
+  return parseJsonSafe(text) as T;
 }
 
 function getHeaders(requireAuth: boolean): Record<string, string> {
@@ -51,6 +110,7 @@ export const api = {
     const response = await fetch(`${API_PREFIX}${url}`, {
       method: 'GET',
       headers: getHeaders(requireAuth),
+      cache: 'no-store',
     });
     return handleResponse<T>(response);
   },
