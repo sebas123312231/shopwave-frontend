@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Plus, Edit, Trash2, Search } from 'lucide-react';
+import { Plus, Edit, Trash2, Search, ChevronLeft } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import { Spinner } from '@/components/ui/Spinner';
@@ -86,7 +86,17 @@ export default function AdminProductsPage() {
 
   return (
     <AdminGuard>
-    <div className="max-w-7xl mx-auto">
+
+    <div className="max-w-7xl mx-auto py-6 md:py-8">
+
+      <Link
+        href="/admin"
+        className="inline-flex items-center gap-2 text-sm font-semibold text-accent hover:text-accent-dark transition-colors mb-6"
+      >
+        <ChevronLeft size={18} />
+        Volver al panel de administración
+      </Link>
+
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
         <div>
           <h1 className="text-3xl font-bold text-foreground tracking-tight">Gestión de Productos</h1>
@@ -204,3 +214,4 @@ export default function AdminProductsPage() {
     </AdminGuard>
   );
 }
+//a
