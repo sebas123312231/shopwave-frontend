@@ -35,11 +35,11 @@ export const ProductService = {
     }
     
     if (filters.minPrice !== undefined) {
-      filtered = filtered.filter(p => p.price >= filters.minPrice!);
+      filtered = filtered.filter(p => p.discountedPrice >= filters.minPrice!);
     }
     
     if (filters.maxPrice !== undefined) {
-      filtered = filtered.filter(p => p.price <= filters.maxPrice!);
+      filtered = filtered.filter(p => p.discountedPrice <= filters.maxPrice!);
     }
     
     if (filters.minDiscount !== undefined && filters.minDiscount > 0) {
@@ -65,10 +65,10 @@ export const ProductService = {
     if (filters.sort) {
       switch (filters.sort) {
         case 'price_asc':
-          filtered.sort((a, b) => a.price - b.price);
+          filtered.sort((a, b) => a.discountedPrice - b.discountedPrice);
           break;
         case 'price_desc':
-          filtered.sort((a, b) => b.price - a.price);
+          filtered.sort((a, b) => b.discountedPrice - a.discountedPrice);
           break;
         case 'discount':
           filtered.sort((a, b) => b.discountPersent - a.discountPersent);
