@@ -49,7 +49,7 @@ export const ProductList = ({
       {products.map((product, index) => (
         <div
           key={product.id}
-          className="animate-slideUp"
+          className="animate-slideUp h-full"
           style={{ animationDelay: `${index * 50}ms` }}
         >
           <ProductCard product={product} />
