@@ -61,7 +61,7 @@ export const Modal = ({
       <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
 
       <div
-        className="relative w-full max-w-md rounded-2xl bg-white border border-border shadow-xl p-6 animate-scaleIn"
+        className="relative w-full max-w-md rounded-2xl bg-surface border border-border shadow-xl p-6 animate-scaleIn"
         onClick={(e) => e.stopPropagation()}
       >
         {variant === 'danger' && (
