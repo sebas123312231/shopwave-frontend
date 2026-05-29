@@ -171,7 +171,7 @@ export const ProductForm = ({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="rounded-2xl bg-white border border-border shadow-sm p-6 md:p-8 space-y-6">
+      <div className="rounded-2xl bg-surface border border-border shadow-sm p-6 md:p-8 space-y-6">
         <h2 className="text-lg font-bold text-foreground">Información básica</h2>
 
         <Input
@@ -249,7 +249,7 @@ export const ProductForm = ({
         />
       </div>
 
-      <div className="rounded-2xl bg-white border border-border shadow-sm p-6 md:p-8 space-y-6">
+      <div className="rounded-2xl bg-surface border border-border shadow-sm p-6 md:p-8 space-y-6">
         <h2 className="text-lg font-bold text-foreground">Categorización</h2>
 
         <div className="grid gap-5 md:grid-cols-3">
@@ -275,7 +275,7 @@ export const ProductForm = ({
         </div>
       </div>
 
-      <div className="rounded-2xl bg-white border border-border shadow-sm p-6 md:p-8 space-y-6">
+      <div className="rounded-2xl bg-surface border border-border shadow-sm p-6 md:p-8 space-y-6">
         <h2 className="text-lg font-bold text-foreground">Tallas</h2>
 
         <div className="flex gap-3 items-end">
@@ -325,7 +325,7 @@ export const ProductForm = ({
         )}
       </div>
 
-      <div className="rounded-2xl bg-white border border-border shadow-sm p-6 md:p-8 space-y-6">
+      <div className="rounded-2xl bg-surface border border-border shadow-sm p-6 md:p-8 space-y-6">
         <h2 className="text-lg font-bold text-foreground">Imagen</h2>
 
         <Input

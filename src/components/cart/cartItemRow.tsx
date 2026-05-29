@@ -82,7 +82,7 @@ export const CartItemRow: React.FC<CartItemRowProps> = ({ item }) => {
       </div>
       <div className="flex justify-end w-full sm:col-span-1">
         <Button variant="ghost" size="sm" disabled={updating} onClick={handleRemove}
-          className="text-error hover:bg-red-50"><Trash2 size={18} /></Button>
+          className="text-error hover:bg-surface-red"><Trash2 size={18} /></Button>
       </div>
     </div>
   );

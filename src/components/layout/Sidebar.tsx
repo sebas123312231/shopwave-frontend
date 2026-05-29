@@ -17,6 +17,7 @@ import {
   User,
 } from 'lucide-react';
 import { useState } from 'react';
+import { ThemeToggle } from '@/components/ui/ThemeToggle';
 
 interface NavItem {
   label: string;
@@ -66,18 +67,21 @@ export const Sidebar = () => {
 
   return (
     <>
-      <header className="fixed top-0 left-0 right-0 z-40 flex h-14 items-center justify-between bg-white/80 px-4 backdrop-blur-md border-b border-border md:hidden">
+      <header className="fixed top-0 left-0 right-0 z-40 flex h-14 items-center justify-between bg-surface/80 px-4 backdrop-blur-md border-b border-border md:hidden">
         <Link href="/" className="flex items-center gap-2 text-lg font-bold text-accent">
           <Store size={22} />
           ShopWave
         </Link>
-        <button
-          onClick={() => setIsOpen(true)}
-          className="flex h-9 w-9 items-center justify-center rounded-lg text-foreground hover:bg-background-alt transition-colors"
-          aria-label="Abrir menú"
-        >
-          <Menu size={22} />
-        </button>
+        <div className="flex items-center gap-2">
+          <ThemeToggle />
+          <button
+            onClick={() => setIsOpen(true)}
+            className="flex h-9 w-9 items-center justify-center rounded-lg text-foreground hover:bg-background-alt transition-colors"
+            aria-label="Abrir menú"
+          >
+            <Menu size={22} />
+          </button>
+        </div>
       </header>
 
       {isOpen && (
@@ -101,13 +105,16 @@ export const Sidebar = () => {
             <Store size={24} />
             ShopWave
           </Link>
-          <button
-            onClick={() => setIsOpen(false)}
-            className="flex h-9 w-9 items-center justify-center rounded-lg text-white/60 hover:text-white hover:bg-white/10 transition-colors md:hidden"
-            aria-label="Cerrar menú"
-          >
-            <X size={20} />
-          </button>
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
+            <button
+              onClick={() => setIsOpen(false)}
+              className="flex h-9 w-9 items-center justify-center rounded-lg text-white/60 hover:text-white hover:bg-white/10 transition-colors md:hidden"
+              aria-label="Cerrar menú"
+            >
+              <X size={20} />
+            </button>
+          </div>
         </div>
 
         <nav className="flex-1 overflow-y-auto p-4">
