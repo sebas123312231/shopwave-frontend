@@ -50,7 +50,7 @@ export default function OrderDetailPage() {
     return (
       <AuthGuard>
         <div className="max-w-5xl mx-auto px-4 py-8">
-          <div className="bg-red-50 border border-red-200 rounded-xl p-4 text-red-700 text-sm mb-4 flex items-start gap-3">
+          <div className="bg-surface-red border border-border-red rounded-xl p-4 text-text-on-red text-sm mb-4 flex items-start gap-3">
             <AlertCircle size={18} className="mt-0.5 flex-shrink-0" />
             <div>
               <p className="font-semibold">No se pudo cargar la orden</p>
