@@ -57,14 +57,14 @@ export default function ProductDetailPage() {
           <Spinner size="lg" />
         </div>
       ) : error ? (
-        <div className="rounded-2xl border border-red-200 bg-red-50 p-6 flex items-center gap-3">
+        <div className="rounded-2xl border border-border-red bg-surface-red p-6 flex items-center gap-3">
           <svg className="w-6 h-6 text-error flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
           <p className="text-error font-medium">{error}</p>
         </div>
       ) : !product ? (
-        <div className="rounded-2xl border-2 border-dashed border-border p-12 text-center bg-white">
+        <div className="rounded-2xl border-2 border-dashed border-border p-12 text-center bg-surface">
           <p className="text-foreground-muted">Producto no encontrado.</p>
         </div>
       ) : (

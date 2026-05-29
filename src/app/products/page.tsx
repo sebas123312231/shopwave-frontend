@@ -51,7 +51,7 @@ export default function ProductsPage() {
           <ProductList products={productsPage?.content ?? []} loading={loading} error={error} />
 
           {productsPage && totalPages > 1 && (
-            <div className="flex items-center justify-between rounded-2xl bg-white border border-border px-5 py-4 shadow-sm">
+            <div className="flex items-center justify-between rounded-2xl bg-surface border border-border px-5 py-4 shadow-sm">
               <p className="text-sm text-foreground-muted">
                 Página <span className="font-semibold text-foreground">{currentPage + 1}</span> de{' '}
                 <span className="font-semibold text-foreground">{totalPages}</span>
