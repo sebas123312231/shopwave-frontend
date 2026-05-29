@@ -31,7 +31,7 @@ export const ProductFilter = ({
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 
   return (
-    <aside className="rounded-2xl bg-white shadow-lg border border-border overflow-hidden">
+    <aside className="rounded-2xl bg-surface shadow-lg border border-border overflow-hidden">
       {/* Filter header - always visible */}
       <button
         onClick={() => setIsFilterOpen(!isFilterOpen)}
@@ -68,7 +68,7 @@ export const ProductFilter = ({
               placeholder="Buscar productos..."
               value={searchTerm}
               onChange={(event) => onSearchChange(event.target.value)}
-              className="w-full rounded-xl border border-border bg-background-alt pl-10 pr-8 py-2.5 text-sm text-foreground outline-none transition focus:border-accent focus:bg-white focus:ring-2 focus:ring-accent/20 placeholder:text-foreground-muted"
+              className="w-full rounded-xl border border-border bg-background-alt pl-10 pr-8 py-2.5 text-sm text-foreground outline-none transition focus:border-accent focus:bg-surface focus:ring-2 focus:ring-accent/20 placeholder:text-foreground-muted"
             />
             {searchTerm && (
               <button
@@ -81,9 +81,9 @@ export const ProductFilter = ({
           </div>
 
           {isSearchActive && (
-            <div className="rounded-xl bg-blue-50 border border-blue-200 p-3 flex items-center gap-2">
+            <div className="rounded-xl bg-surface-blue border border-border-blue p-3 flex items-center gap-2">
               <Search size={16} className="text-accent" />
-              <p className="text-xs text-accent-dark">Filtros desactivados durante búsqueda</p>
+              <p className="text-xs text-text-on-blue">Filtros desactivados durante búsqueda</p>
             </div>
           )}
 

@@ -26,7 +26,7 @@ export const ProductList = ({
 
   if (error) {
     return (
-      <div className="rounded-2xl border border-red-200 bg-red-50 p-4 flex items-center gap-3">
+      <div className="rounded-2xl border border-border-red bg-surface-red p-4 flex items-center gap-3">
         <svg className="w-5 h-5 text-error flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
@@ -37,7 +37,7 @@ export const ProductList = ({
 
   if (products.length === 0) {
     return (
-      <div className="rounded-2xl border-2 border-dashed border-border p-12 text-center bg-white">
+      <div className="rounded-2xl border-2 border-dashed border-border p-12 text-center bg-surface">
         <Package size={48} className="mx-auto text-foreground-muted mb-4" />
         <p className="text-foreground-muted">{emptyMessage}</p>
       </div>

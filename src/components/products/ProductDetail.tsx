@@ -18,7 +18,7 @@ export const ProductDetail = ({ product }: ProductDetailProps) => {
 
   return (
     <section className="grid gap-10 lg:grid-cols-[3fr_4fr]">
-      <div className="overflow-hidden rounded-2xl shadow-2xl border border-border bg-white">
+      <div className="overflow-hidden rounded-2xl shadow-2xl border border-border bg-surface">
         <img src={product.imageUrl} alt={product.title} className="h-full w-full object-cover" />
       </div>
 
@@ -52,7 +52,7 @@ export const ProductDetail = ({ product }: ProductDetailProps) => {
               {availableSizes.map((size) => (
                 <span
                   key={size}
-                  className="rounded-xl border border-border bg-white px-4 py-2.5 text-sm font-medium text-foreground"
+                  className="rounded-xl border border-border bg-surface px-4 py-2.5 text-sm font-medium text-foreground"
                 >
                   {size}
                 </span>

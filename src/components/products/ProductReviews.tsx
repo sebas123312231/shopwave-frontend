@@ -82,7 +82,7 @@ export const ProductReviews = ({ productId, reviews, ratings, averageRating, onR
   };
 
   return (
-    <section className="space-y-6 rounded-2xl bg-white shadow-sm border border-border p-6 md:p-8">
+    <section className="space-y-6 rounded-2xl bg-surface shadow-sm border border-border p-6 md:p-8">
       <header className="space-y-2 pb-4 border-b border-border">
         <h2 className="text-xl md:text-2xl font-bold text-foreground">Reseñas y calificaciones</h2>
         <div className="flex items-center gap-2">
@@ -105,7 +105,7 @@ export const ProductReviews = ({ productId, reviews, ratings, averageRating, onR
               value={reviewText}
               onChange={(event) => setReviewText(event.target.value)}
               placeholder="¿Qué te pareció este producto?"
-              className="w-full rounded-xl border border-border bg-white px-3.5 py-2.5 text-sm text-foreground outline-none transition placeholder:text-foreground-muted focus:border-accent focus:ring-2 focus:ring-accent/20 resize-none"
+              className="w-full rounded-xl border border-border bg-surface px-3.5 py-2.5 text-sm text-foreground outline-none transition placeholder:text-foreground-muted focus:border-accent focus:ring-2 focus:ring-accent/20 resize-none"
               rows={3}
             />
             <Button type="submit" loading={reviewLoading}>
@@ -125,25 +125,25 @@ export const ProductReviews = ({ productId, reviews, ratings, averageRating, onR
           </div>
         </div>
       ) : (
-        <div className="rounded-xl bg-blue-50 border border-blue-200 p-4 flex items-center gap-3">
+        <div className="rounded-xl bg-surface-blue border border-border-blue p-4 flex items-center gap-3">
           <LogIn size={20} className="text-accent flex-shrink-0" />
-          <p className="text-sm text-accent-dark">
+          <p className="text-sm text-text-on-blue">
             <a href="/login" className="font-semibold hover:underline">Inicia sesión</a> para publicar una reseña o calificación.
           </p>
         </div>
       )}
 
       {successMessage && (
-        <div className="rounded-xl bg-green-50 border border-green-200 p-4 flex items-center gap-3">
+        <div className="rounded-xl bg-surface-green border border-border-green p-4 flex items-center gap-3">
           <CheckCircle size={20} className="text-success flex-shrink-0" />
-          <p className="text-sm text-green-700">{successMessage}</p>
+          <p className="text-sm text-text-on-green">{successMessage}</p>
         </div>
       )}
 
       {error && (
-        <div className="rounded-xl bg-red-50 border border-red-200 p-4 flex items-center gap-3">
+        <div className="rounded-xl bg-surface-red border border-border-red p-4 flex items-center gap-3">
           <AlertCircle size={20} className="text-error flex-shrink-0" />
-          <p className="text-sm text-red-700">{error}</p>
+          <p className="text-sm text-text-on-red">{error}</p>
         </div>
       )}
 

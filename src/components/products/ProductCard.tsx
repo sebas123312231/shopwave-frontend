@@ -11,7 +11,7 @@ export const ProductCard = ({ product }: ProductCardProps) => {
   return (
     <Link
       href={`/products/${product.id}`}
-      className="group rounded-2xl bg-white shadow-sm border border-transparent hover:shadow-xl hover:scale-[1.02] hover:border-blue-100 transition-all duration-300 overflow-hidden flex flex-col h-full"
+      className="group rounded-2xl bg-surface shadow-sm border border-transparent hover:shadow-xl hover:scale-[1.02] hover:border-accent/30 transition-all duration-300 overflow-hidden flex flex-col h-full"
     >
       <div className="relative aspect-[4/3] overflow-hidden bg-background-alt">
         <img
