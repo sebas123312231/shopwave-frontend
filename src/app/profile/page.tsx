@@ -31,7 +31,7 @@ export default function ProfilePage() {
         )}
 
         {error && (
-          <div className="bg-red-50 border border-red-200 rounded-xl p-6 text-red-700">
+          <div className="bg-surface-red border border-border-red rounded-xl p-6 text-text-on-red">
             <p className="font-semibold">No se pudo cargar el perfil</p>
             <p className="mt-1 text-sm">{error}</p>
           </div>
@@ -53,7 +53,7 @@ export default function ProfilePage() {
             </div>
 
             {/* Sección 2: Tarjeta de datos personales */}
-            <div className="bg-white border border-border rounded-2xl p-6">
+            <div className="bg-surface border border-border rounded-2xl p-6">
               <h2 className="text-sm font-semibold text-foreground-muted uppercase tracking-wider mb-4">
                 Información de la Cuenta
               </h2>
@@ -90,7 +90,7 @@ export default function ProfilePage() {
             </div>
 
             {/* Sección 3: Libreta de direcciones */}
-            <div className="bg-white border border-border rounded-2xl p-6">
+            <div className="bg-surface border border-border rounded-2xl p-6">
               <h2 className="text-sm font-semibold text-foreground-muted uppercase tracking-wider mb-4">
                 Libreta de Direcciones
               </h2>
