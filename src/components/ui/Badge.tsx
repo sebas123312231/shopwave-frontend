@@ -7,10 +7,10 @@ interface BadgeProps {
 }
 
 const variantMap: Record<NonNullable<BadgeProps['variant']>, string> = {
-  default: 'bg-surface-blue text-accent-dark',
-  success: 'bg-green-50 text-green-700',
-  warning: 'bg-amber-50 text-amber-700',
-  danger: 'bg-red-50 text-red-700',
+  default: 'bg-surface-blue text-text-on-blue',
+  success: 'bg-surface-green text-text-on-green',
+  warning: 'bg-surface-amber text-text-on-amber',
+  danger: 'bg-surface-red text-text-on-red',
 };
 
 export const Badge = ({ children, variant = 'default', className = '' }: BadgeProps) => {
