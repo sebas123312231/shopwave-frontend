@@ -133,7 +133,7 @@ export default function AdminOrdersPage() {
         </div>
       )}
 
-      <div className="rounded-2xl bg-white border border-border shadow-sm">
+      <div className="rounded-2xl bg-surface border border-border shadow-sm">
         <div className="p-4 border-b border-border flex flex-col md:flex-row gap-4">
           <div className="relative flex-1 max-w-md">
             <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-foreground-muted" />
@@ -142,7 +142,7 @@ export default function AdminOrdersPage() {
               placeholder="Buscar por orden o cliente..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full rounded-xl border border-border bg-background-alt pl-10 pr-4 py-2.5 text-sm outline-none transition focus:border-accent focus:bg-white focus:ring-2 focus:ring-accent/20"
+              className="w-full rounded-xl border border-border bg-background-alt pl-10 pr-4 py-2.5 text-sm outline-none transition focus:border-accent focus:bg-surface focus:ring-2 focus:ring-accent/20"
             />
           </div>
           <Select
@@ -197,7 +197,7 @@ export default function AdminOrdersPage() {
                               {order.orderStatus === 'PLACED' && (
                                 <button
                                   onClick={() => handleStatusChange(order.id, 'confirm')}
-                                  className="p-2 rounded-lg hover:bg-green-50 text-success transition-colors"
+                                  className="p-2 rounded-lg hover:bg-surface-green text-success transition-colors"
                                   title="Confirmar"
                                 >
                                   <CheckCircle size={16} />
@@ -206,7 +206,7 @@ export default function AdminOrdersPage() {
                               {order.orderStatus === 'CONFIRMED' && (
                                 <button
                                   onClick={() => handleStatusChange(order.id, 'ship')}
-                                  className="p-2 rounded-lg hover:bg-amber-50 text-amber-600 transition-colors"
+                                  className="p-2 rounded-lg hover:bg-surface-amber text-text-on-amber transition-colors"
                                   title="Enviar"
                                 >
                                   <Truck size={16} />
@@ -215,7 +215,7 @@ export default function AdminOrdersPage() {
                               {order.orderStatus === 'SHIPPED' && (
                                 <button
                                   onClick={() => handleStatusChange(order.id, 'deliver')}
-                                  className="p-2 rounded-lg hover:bg-blue-50 text-blue-600 transition-colors"
+                                  className="p-2 rounded-lg hover:bg-surface-blue text-text-on-blue transition-colors"
                                   title="Entregar"
                                 >
                                   <Package size={16} />
@@ -224,7 +224,7 @@ export default function AdminOrdersPage() {
                               {order.orderStatus !== 'DELIVERED' && order.orderStatus !== 'CANCELLED' && (
                                 <button
                                   onClick={() => handleStatusChange(order.id, 'cancel')}
-                                  className="p-2 rounded-lg hover:bg-red-50 text-error transition-colors"
+                                  className="p-2 rounded-lg hover:bg-surface-red text-error transition-colors"
                                   title="Cancelar"
                                 >
                                   <XCircle size={16} />
@@ -232,7 +232,7 @@ export default function AdminOrdersPage() {
                               )}
                               <button
                                 onClick={() => setDeleteModal({ isOpen: true, order })}
-                                className="p-2 rounded-lg hover:bg-red-50 text-error transition-colors"
+                                className="p-2 rounded-lg hover:bg-surface-red text-error transition-colors"
                                 title="Eliminar"
                               >
                                 <Trash2 size={16} />

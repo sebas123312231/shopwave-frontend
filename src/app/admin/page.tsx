@@ -114,14 +114,14 @@ export default function AdminPage() {
 
   const getStatusColor = (status: string) => {
     const colors: Record<string, string> = {
-      PLACED: 'bg-amber-50 text-amber-700',
-      PENDING: 'bg-amber-50 text-amber-700',
-      CONFIRMED: 'bg-blue-50 text-blue-700',
-      SHIPPED: 'bg-purple-50 text-purple-700',
-      DELIVERED: 'bg-green-50 text-green-700',
-      CANCELLED: 'bg-red-50 text-red-700',
+      PLACED: 'bg-surface-amber text-text-on-amber',
+      PENDING: 'bg-surface-amber text-text-on-amber',
+      CONFIRMED: 'bg-surface-blue text-text-on-blue',
+      SHIPPED: 'bg-surface-purple text-text-on-purple',
+      DELIVERED: 'bg-surface-green text-text-on-green',
+      CANCELLED: 'bg-surface-red text-text-on-red',
     };
-    return colors[status] || 'bg-gray-50 text-gray-700';
+    return colors[status] || 'bg-background-alt text-foreground-muted';
   };
 
   return (
@@ -148,7 +148,7 @@ export default function AdminPage() {
             {statsCards.map((stat, index) => (
               <div
                 key={stat.label}
-                className="rounded-2xl bg-white border border-border shadow-sm p-6 hover:shadow-lg transition-shadow animate-slideUp"
+                className="rounded-2xl bg-surface border border-border shadow-sm p-6 hover:shadow-lg transition-shadow animate-slideUp"
                 style={{ animationDelay: `${index * 50}ms` }}
               >
                 <div className={`h-12 w-12 rounded-xl flex items-center justify-center mb-4 bg-${stat.color}/10 text-${stat.color}`}>
@@ -162,7 +162,7 @@ export default function AdminPage() {
           </div>
 
           <div className="grid gap-6">
-            <div className="rounded-2xl bg-white border border-border shadow-sm p-6 animate-slideUp animation-delay-200">
+            <div className="rounded-2xl bg-surface border border-border shadow-sm p-6 animate-slideUp animation-delay-200">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-lg font-bold text-foreground">Acciones rápidas</h2>
               </div>
