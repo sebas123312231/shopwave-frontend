@@ -34,7 +34,7 @@ export default function AdminCreateProductPage() {
 
   return (
     <AdminGuard>
-    <div className="max-w-3xl mx-auto">
+    <div className="max-w-3xl mx-auto px-4 md:px-8 py-6 md:py-8">
       <div className="mb-8">
         <Button variant="ghost" onClick={() => router.push('/admin/products')} className="mb-4">
           <ArrowLeft size={18} />
@@ -66,3 +66,4 @@ export default function AdminCreateProductPage() {
     </AdminGuard>
   );
 }
+//a
