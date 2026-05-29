@@ -21,7 +21,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <CartProvider>
             <div className="flex min-h-screen bg-background">
               <Sidebar />
-              <main className="flex-1 pt-14 md:pt-0 md:ml-64">
+              <main className="flex-1 min-w-0 overflow-x-hidden pt-14 md:pt-0 md:ml-64">
                 {children}
               </main>
             </div>

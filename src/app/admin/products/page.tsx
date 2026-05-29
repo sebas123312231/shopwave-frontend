@@ -87,7 +87,7 @@ export default function AdminProductsPage() {
   return (
     <AdminGuard>
 
-    <div className="max-w-7xl mx-auto py-6 md:py-8">
+    <div className="max-w-7xl mx-auto px-4 md:px-8 py-6 md:py-8">
 
       <Link
         href="/admin"
