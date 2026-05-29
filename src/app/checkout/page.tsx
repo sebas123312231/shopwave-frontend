@@ -144,7 +144,7 @@ export default function CheckoutPage() {
     return (
       <AuthGuard>
         <div className="max-w-3xl mx-auto px-4 py-12 text-center">
-          <div className="bg-white rounded-2xl border-2 border-dashed border-border p-12">
+          <div className="bg-surface rounded-2xl border-2 border-dashed border-border p-12">
             <ShoppingBag size={48} className="mx-auto text-foreground-muted mb-4" />
             <h2 className="text-xl font-bold text-foreground mb-2">Tu carrito está vacío</h2>
             <p className="text-foreground-muted mb-6">
@@ -188,7 +188,7 @@ export default function CheckoutPage() {
         </div>
 
         {submitError && (
-          <div className="bg-red-50 border border-red-200 rounded-xl p-4 text-red-700 text-sm mb-6 flex items-start gap-3">
+          <div className="bg-surface-red border border-border-red rounded-xl p-4 text-text-on-red text-sm mb-6 flex items-start gap-3">
             <AlertCircle size={18} className="mt-0.5 flex-shrink-0" />
             <div>
               <p className="font-semibold">Error al confirmar la orden</p>
@@ -241,7 +241,7 @@ export default function CheckoutPage() {
 
         {step === 3 && createdOrderId && (
           <div className="bg-surface border border-border rounded-2xl shadow-lg p-8 md:p-12 text-center animate-scaleIn">
-            <div className="w-16 h-16 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-4">
+            <div className="w-16 h-16 bg-surface-green rounded-full flex items-center justify-center mx-auto mb-4">
               <CheckCircle size={32} className="text-success" />
             </div>
             <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-2">

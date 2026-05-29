@@ -25,7 +25,7 @@ export default function CartPage() {
   return (
     <AuthGuard>
       <div className="max-w-4xl mx-auto px-4 py-16 min-h-screen flex items-center justify-center">
-        <div className="bg-white border-2 border-dashed border-border rounded-2xl p-12 text-center w-full">
+        <div className="bg-surface border-2 border-dashed border-border rounded-2xl p-12 text-center w-full">
           <ShoppingCart size={48} className="mx-auto text-foreground-muted mb-4" />
           <h1 className="text-2xl font-bold text-foreground mb-2">Carrito de Compras</h1>
           <p className="text-foreground-muted text-sm">
@@ -75,7 +75,7 @@ export default function CartPage() {
     return (
       <AuthGuard>
         <div className="max-w-5xl mx-auto px-4 py-12">
-          <div className="bg-red-50 border border-red-200 rounded-xl p-4 text-red-700 text-sm">
+          <div className="bg-surface-red border border-border-red rounded-xl p-4 text-text-on-red text-sm">
             <p className="font-semibold">Error al cargar el carrito</p>
             <p className="mt-1">{error}</p>
           </div>
