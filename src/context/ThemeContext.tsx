@@ -8,25 +8,29 @@ interface ThemeContextType {
   theme: Theme;
   toggleTheme: () => void;
   isDark: boolean;
+  mounted: boolean;
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 const STORAGE_KEY = 'shopwave-theme';
 
-const getInitialTheme = (): Theme => {
-  if (typeof window === 'undefined') return 'light';
-  try {
-    const stored = localStorage.getItem(STORAGE_KEY) as Theme | null;
-    if (stored === 'dark' || stored === 'light') return stored;
-  } catch { /* SSR or private browsing */ }
-  return 'light';
-};
-
 export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
-  const [theme, setTheme] = useState<Theme>(getInitialTheme);
+  const [theme, setTheme] = useState<Theme>('light');
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    try {
+      const stored = localStorage.getItem(STORAGE_KEY) as Theme | null;
+      if (stored === 'dark' || stored === 'light') {
+        setTheme(stored); // eslint-disable-line react-hooks/set-state-in-effect
+      }
+    } catch { /* ignore */ }
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!mounted) return;
     const root = document.documentElement;
     if (theme === 'dark') {
       root.classList.add('dark');
@@ -34,7 +38,7 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
       root.classList.remove('dark');
     }
     localStorage.setItem(STORAGE_KEY, theme);
-  }, [theme]);
+  }, [theme, mounted]);
 
   const toggleTheme = useCallback(() => {
     setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));
@@ -43,7 +47,7 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
   const isDark = theme === 'dark';
 
   return (
-    <ThemeContext.Provider value={{ theme, toggleTheme, isDark }}>
+    <ThemeContext.Provider value={{ theme, toggleTheme, isDark, mounted }}>
       {children}
     </ThemeContext.Provider>
   );
