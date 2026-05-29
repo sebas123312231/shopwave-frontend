@@ -19,11 +19,6 @@ const sortOptions = [
   { label: 'Precio: mayor a menor', value: 'price_desc' },
 ];
 
-const stockOptions = [
-  { label: 'Todos', value: '' },
-  { label: 'Solo con stock', value: 'true' },
-  { label: 'Sin stock', value: 'false' },
-];
 
 export const ProductFilter = ({
   filters,
@@ -126,18 +121,6 @@ export const ProductFilter = ({
               />
             </div>
 
-            <Input
-              label="Descuento mínimo (%)"
-              type="number"
-              min={0}
-              max={100}
-              value={filters.minDiscount ?? 0}
-              onChange={(event) => {
-                const value = event.target.value;
-                onFiltersChange({ minDiscount: value ? Number(value) : 0 });
-              }}
-              disabled={isSearchActive}
-            />
 
             <Select
               label="Ordenar"
@@ -148,16 +131,6 @@ export const ProductFilter = ({
               disabled={isSearchActive}
             />
 
-            <Select
-              label="Stock"
-              options={stockOptions}
-              value={filters.stock === undefined ? '' : String(filters.stock)}
-              onChange={(event) => {
-                const value = event.target.value;
-                onFiltersChange({ stock: value ? value === 'true' : undefined });
-              }}
-              disabled={isSearchActive}
-            />
 
             <Input
               label="Colores"
