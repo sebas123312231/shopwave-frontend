@@ -64,13 +64,24 @@ Esto instalará todas las dependencias del proyecto listadas en `package.json`.
 
 ### Paso 3: Variables de entorno
 
-El proyecto incluye un archivo `.env.local` con la configuración básica:
+Para desarrollo local, puedes usar un archivo `.env.local` con la configuración básica:
 
 ```env
 NEXT_PUBLIC_API_URL=http://localhost:8080
+BACKEND_URL=http://localhost:8080
 ```
 
 > **Nota:** El token JWT nunca debe ir en variables de entorno. Se maneja directamente en el código via `localStorage`.
+
+### Deploy en Netlify
+
+El frontend está preparado para Netlify y apunta por defecto al backend publicado en Render:
+
+```env
+BACKEND_URL=https://shopwave-backend-1-j1l2.onrender.com
+```
+
+Si prefieres controlar el destino desde Netlify, define la variable `BACKEND_URL` en el panel del sitio con ese mismo valor.
 
 ### Paso 4: Levantar el backend (Docker)
 
