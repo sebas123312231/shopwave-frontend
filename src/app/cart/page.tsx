@@ -1,66 +1,22 @@
-/*
- * ================================================================
- * CARRITO DE COMPRAS — MÓDULO EN DESARROLLO / ERRORES PENDIENTES
- * ================================================================
- * Esta página está temporalmente deshabilitada.
- * El código de implementación se conserva comentado más abajo para
- * ser retomado en la entrega del 100%.
- *
- * Archivos relacionados:
- *   - src/components/cart/cartItemRow.tsx
- *   - src/components/cart/cartSummary.tsx
- *   - src/components/cart/EmptyCart.tsx
- *   - src/context/CartContext.tsx
- *   - src/services/cart.service.ts
- *   - src/services/cartItem.service.ts
- * ================================================================
- */
-
 'use client';
 
-import { AuthGuard } from '@/guards/AuthGuard';
-import { ShoppingCart } from 'lucide-react';
-
-export default function CartPage() {
-  return (
-    <AuthGuard>
-      <div className="max-w-4xl mx-auto px-4 py-16 min-h-screen flex items-center justify-center">
-        <div className="bg-surface border-2 border-dashed border-border rounded-2xl p-12 text-center w-full">
-          <ShoppingCart size={48} className="mx-auto text-foreground-muted mb-4" />
-          <h1 className="text-2xl font-bold text-foreground mb-2">Carrito de Compras</h1>
-          <p className="text-foreground-muted text-sm">
-            Esta sección está en desarrollo y será habilitada próximamente.
-          </p>
-        </div>
-      </div>
-    </AuthGuard>
-  );
-}
-
-/*
-// ================================================================
-// IMPLEMENTACIÓN ORIGINAL — PENDIENTE DE CORRECCIÓN
-// ================================================================
-
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useCart } from '@/hooks/useCart';
 import { AuthGuard } from '@/guards/AuthGuard';
-import { CartItemRow } from '@/components/cart/CartItemRow';
-import { CartSummary } from '@/components/cart/CartSummary';
+import { CartItemRow } from '@/components/cart/cartItemRow';
+import { CartSummary } from '@/components/cart/cartSummary';
 import { EmptyCart } from '@/components/cart/EmptyCart';
 import { Spinner } from '@/components/ui/Spinner';
 import { ShoppingCart } from 'lucide-react';
 
 export default function CartPage() {
   const { cart, loading, error, refreshCart } = useCart();
-  const [initStarted, setInitStarted] = useState(false);
 
   useEffect(() => {
     refreshCart();
-    setInitStarted(true);
   }, [refreshCart]);
 
-  if (loading || !initStarted) {
+  if (loading) {
     return (
       <AuthGuard>
         <div className="min-h-screen flex flex-col items-center justify-center gap-3 bg-background">
@@ -119,4 +75,3 @@ export default function CartPage() {
     </AuthGuard>
   );
 }
-*/

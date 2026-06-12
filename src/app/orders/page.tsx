@@ -33,7 +33,6 @@ export default function OrdersPage() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [initStarted] = useState(true);
   const router = useRouter();
 
   useEffect(() => {
@@ -52,7 +51,7 @@ export default function OrdersPage() {
   }, []);
 
   useEffect(() => {
-    if (initStarted && loading) {
+    if (loading) {
       const timer = setTimeout(() => {
         if (loading) {
           setError('El servidor está tardando demasiado. Por favor reintenta.');
@@ -61,14 +60,14 @@ export default function OrdersPage() {
       }, 15000);
       return () => clearTimeout(timer);
     }
-  }, [initStarted, loading]);
+  }, [loading]);
 
   return (
     <AuthGuard>
       <div className="max-w-5xl mx-auto px-4 py-8 md:py-12 min-h-screen">
         <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-8">Mis Órdenes</h1>
 
-        {loading || !initStarted ? (
+        {loading ? (
           <div className="flex justify-center items-center py-24">
             <Spinner size="lg" />
           </div>

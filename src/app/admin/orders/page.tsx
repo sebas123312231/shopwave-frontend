@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Search, CheckCircle, Truck, Package, XCircle, Trash2 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { Search, CheckCircle, Truck, Package, XCircle, Trash2, Eye } from 'lucide-react';
 import { Badge } from '@/components/ui/Badge';
 import { Select } from '@/components/ui/Select';
 import { Spinner } from '@/components/ui/Spinner';
@@ -39,6 +40,7 @@ const getStatusBadge = (status: OrderStatus) => {
 };
 
 export default function AdminOrdersPage() {
+  const router = useRouter();
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -187,14 +189,21 @@ export default function AdminOrdersPage() {
                         {new Date(order.orderDate).toLocaleDateString('es-ES')}
                       </td>
                       <td className="px-4 py-3">{getStatusBadge(order.orderStatus)}</td>
-                      <td className="px-4 py-3 font-semibold text-foreground">{formatPrice(order.totalPrice)}</td>
+                      <td className="px-4 py-3 font-semibold text-foreground">{formatPrice(order.totalDiscountedPrice)}</td>
                       <td className="px-4 py-3">
                         <div className="flex items-center justify-end gap-1">
+                          <button
+                            onClick={() => router.push(`/admin/orders/${order.id}`)}
+                            className="p-2 rounded-lg hover:bg-surface-blue text-text-on-blue transition-colors"
+                            title="Ver detalle"
+                          >
+                            <Eye size={16} />
+                          </button>
                           {actionLoading === order.id ? (
                             <Spinner size="sm" />
                           ) : (
                             <>
-                              {order.orderStatus === 'PLACED' && (
+                              {(order.orderStatus === 'PLACED' || order.orderStatus === 'PENDING') && (
                                 <button
                                   onClick={() => handleStatusChange(order.id, 'confirm')}
                                   className="p-2 rounded-lg hover:bg-surface-green text-success transition-colors"

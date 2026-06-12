@@ -2,14 +2,14 @@
 
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
-import { AuthGuard } from '@/guards/AuthGuard';
-import { OrderService } from '@/services/order.service';
+import { AdminGuard } from '@/guards/AdminGuard';
+import { AdminOrderService } from '@/services/admin-order.service';
 import { Order } from '@/models/order.model';
 import { OrderDetailView } from '@/components/orders/OrderDetailView';
 import { Spinner } from '@/components/ui/Spinner';
 import { AlertCircle } from 'lucide-react';
 
-export default function OrderDetailPage() {
+export default function AdminOrderDetailPage() {
   const params = useParams();
   const orderId = Number(params.id);
 
@@ -23,7 +23,7 @@ export default function OrderDetailPage() {
     async function fetchDetail() {
       try {
         setLoading(true);
-        const data = await OrderService.getById(orderId);
+        const data = await AdminOrderService.getById(orderId);
         setOrder(data);
       } catch (err: unknown) {
         setError(err instanceof Error ? err.message : 'Error al cargar el detalle');
@@ -37,17 +37,17 @@ export default function OrderDetailPage() {
 
   if (loading) {
     return (
-      <AuthGuard>
+      <AdminGuard>
         <div className="flex justify-center items-center min-h-screen">
           <Spinner size="lg" />
         </div>
-      </AuthGuard>
+      </AdminGuard>
     );
   }
 
   if (error || !order) {
     return (
-      <AuthGuard>
+      <AdminGuard>
         <div className="max-w-5xl mx-auto px-4 py-8">
           <div className="bg-surface-red border border-border-red rounded-xl p-4 text-text-on-red text-sm flex items-start gap-3">
             <AlertCircle size={18} className="mt-0.5 flex-shrink-0" />
@@ -57,13 +57,13 @@ export default function OrderDetailPage() {
             </div>
           </div>
         </div>
-      </AuthGuard>
+      </AdminGuard>
     );
   }
 
   return (
-    <AuthGuard>
-      <OrderDetailView order={order} backPath="/orders" backLabel="Volver a Mis Órdenes" />
-    </AuthGuard>
+    <AdminGuard>
+      <OrderDetailView order={order} backPath="/admin/orders" backLabel="Volver a Órdenes" />
+    </AdminGuard>
   );
 }

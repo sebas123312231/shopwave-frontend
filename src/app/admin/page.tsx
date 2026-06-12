@@ -61,12 +61,12 @@ export default function AdminPage() {
           .filter((o) => {
             const orderDate = new Date(o.orderDate);
             return (
-              o.orderStatus === 'DELIVERED' &&
+              o.orderStatus !== 'CANCELLED' &&
               orderDate.getMonth() === currentMonth &&
               orderDate.getFullYear() === currentYear
             );
           })
-          .reduce((sum, o) => sum + o.totalPrice, 0);
+          .reduce((sum, o) => sum + o.totalDiscountedPrice, 0);
 
         setStats({
           totalProducts: products.length,
@@ -75,7 +75,8 @@ export default function AdminPage() {
           monthlyRevenue,
         });
 
-        const recent = orders
+        const recent = [...orders]
+          .sort((a, b) => new Date(b.orderDate).getTime() - new Date(a.orderDate).getTime())
           .slice(0, 3)
           .map((o) => ({
             id: o.orderId || `#${o.id}`,
@@ -96,7 +97,7 @@ export default function AdminPage() {
   const statsCards = [
     { label: 'Total Productos', value: stats.totalProducts.toString(), icon: <Package size={24} />, trend: 'Productos en catálogo', color: 'accent' },
     { label: 'Órdenes Totales', value: stats.totalOrders.toString(), icon: <ClipboardList size={24} />, trend: 'Todas las órdenes', color: 'success' },
-    { label: 'Ingresos Mensuales', value: formatPrice(stats.monthlyRevenue), icon: <TrendingUp size={24} />, trend: 'Órdenes entregadas este mes', color: 'accent' },
+    { label: 'Ingresos Mensuales', value: formatPrice(stats.monthlyRevenue), icon: <TrendingUp size={24} />, trend: 'Órdenes no canceladas este mes', color: 'accent' },
     { label: 'Órdenes Pendientes', value: stats.pendingOrders.toString(), icon: <AlertCircle size={24} />, trend: 'Requieren atención', color: 'warning' },
   ];
 
@@ -173,18 +174,16 @@ export default function AdminPage() {
                     Gestionar Productos
                   </Button>
                 </Link>
-                {/* Órdenes: oculto para esta entrega */}
-                {/* <Link href="/admin/orders">
+                <Link href="/admin/orders">
                   <Button variant="secondary" className="w-full justify-start">
                     <ClipboardList size={18} />
                     Ver Órdenes
                   </Button>
-                </Link> */}
+                </Link>
               </div>
             </div>
 
-            {/* Órdenes recientes: oculto para esta entrega */}
-            {/* <div className="rounded-2xl bg-white border border-border shadow-sm p-6 animate-slideUp animation-delay-300">
+            <div className="rounded-2xl bg-surface border border-border shadow-sm p-6 animate-slideUp animation-delay-300">
               <h2 className="text-lg font-bold text-foreground mb-4">Órdenes recientes</h2>
               {recentOrders.length > 0 ? (
                 <div className="space-y-3">
@@ -203,7 +202,7 @@ export default function AdminPage() {
               ) : (
                 <p className="text-sm text-foreground-muted">No hay órdenes recientes</p>
               )}
-            </div> */}
+            </div>
           </div>
         </>
       )}

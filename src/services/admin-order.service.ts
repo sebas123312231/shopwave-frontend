@@ -7,6 +7,10 @@ export const AdminOrderService = {
     return api.get<Order[]>('/admin/orders/', true);
   },
 
+  getById: async (orderId: number): Promise<Order> => {
+    return api.get<Order>(`/orders/${orderId}`, true);
+  },
+
   confirm: async (orderId: number): Promise<Order> => {
     return api.put<Order>(`/admin/orders/${orderId}/confirmed`, {}, true);
   },
