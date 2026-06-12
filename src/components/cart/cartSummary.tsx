@@ -1,23 +1,5 @@
-/*
- * ================================================================
- * CartSummary — MÓDULO EN DESARROLLO / ERRORES PENDIENTES
- * ================================================================
- * Este componente muestra el resumen de totales del carrito
- * y el botón para proceder al checkout.
- * Está deshabilitado hasta que el módulo de carrito sea completado.
- *
- * TODO:
- *   - Calcular totales dinámicamente desde el backend
- *   - Mostrar desglose de descuentos por ítem
- *   - Conectar botón de checkout con validación de stock
- * ================================================================
- */
-
 'use client';
 
-export const CartSummary = () => null;
-
-/*
 import React from 'react';
 import { useRouter } from 'next/navigation';
 import { Cart } from '@/models/cart.model';
@@ -68,4 +50,3 @@ export const CartSummary: React.FC<CartSummaryProps> = ({ cart, showCheckoutButt
     </div>
   );
 };
-*/
