@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/Button';
 import { useCart } from '@/hooks/useCart';
 import { OrderService } from '@/services/order.service';
 import { CreateOrderRequest, PaymentMethod, PaymentStatus } from '@/models/order.model';
-import { AlertCircle, CheckCircle, MapPin, CreditCard, ShoppingBag } from 'lucide-react';
+import { AlertCircle, CheckCircle, MapPin, ShoppingBag } from 'lucide-react';
 
 const paymentMethodOptions: { value: string; label: string }[] = [
   { value: 'CREDIT_CARD', label: 'Tarjeta de Crédito' },
@@ -27,6 +27,7 @@ export default function CheckoutPage() {
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [createdOrderId, setCreatedOrderId] = useState<number | null>(null);
+  const [orderCompleted, setOrderCompleted] = useState(false);
 
   const [addressData, setAddressData] = useState({
     firstName: '',
@@ -122,7 +123,8 @@ export default function CheckoutPage() {
       const order = await OrderService.create(payload);
       setCreatedOrderId(order.id);
       setStep(3);
-      await refreshCart();
+      setOrderCompleted(true);
+      refreshCart();
     } catch (err: unknown) {
       setSubmitError(err instanceof Error ? err.message : 'Error al procesar la orden');
     } finally {
@@ -140,7 +142,7 @@ export default function CheckoutPage() {
     if (step === 2) setStep(1);
   };
 
-  if (!cart || cart.cartItems.length === 0) {
+  if (!orderCompleted && (!cart || cart.cartItems.length === 0)) {
     return (
       <AuthGuard>
         <div className="max-w-3xl mx-auto px-4 py-12 text-center">
@@ -218,10 +220,6 @@ export default function CheckoutPage() {
 
         {step === 2 && (
           <div className="bg-surface border border-border rounded-2xl shadow-lg p-6 md:p-8 animate-slideUp">
-            <div className="flex items-center gap-2 mb-4">
-              <CreditCard size={20} className="text-accent" />
-              <h2 className="text-lg font-bold text-foreground">Método de Pago</h2>
-            </div>
             <CheckoutForm
               formData={checkoutData}
               onChange={handleCheckoutChange}
