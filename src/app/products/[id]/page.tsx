@@ -69,7 +69,7 @@ export default function ProductDetailPage() {
         </div>
       ) : (
         <div className="animate-fadeIn">
-          <ProductDetail product={product} averageRating={0} ratingsCount={0} />
+          <ProductDetail product={product} />
         </div>
       )}
     </div>
