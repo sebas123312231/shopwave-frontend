@@ -34,7 +34,7 @@ export function OrderCard({ order }: OrderCardProps) {
           <p className="text-xs text-foreground-muted uppercase tracking-wider font-semibold">
             Total Pagado
           </p>
-          <p className="text-xl font-extrabold text-foreground">{formatPrice(order.totalPrice)}</p>
+          <p className="text-xl font-extrabold text-foreground">{formatPrice(order.totalDiscountedPrice)}</p>
         </div>
         <Link
           href={`/orders/${order.id}`}
