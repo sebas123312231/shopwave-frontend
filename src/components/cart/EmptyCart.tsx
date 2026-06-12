@@ -1,22 +1,5 @@
-/*
- * ================================================================
- * EmptyCart — MÓDULO EN DESARROLLO / ERRORES PENDIENTES
- * ================================================================
- * Este componente se muestra cuando el carrito del usuario no
- * tiene ítems. Está deshabilitado hasta que el módulo de carrito
- * sea completado.
- *
- * TODO:
- *   - Mostrar sugerencias de productos relacionados
- *   - Agregar animación de entrada
- * ================================================================
- */
-
 'use client';
 
-export const EmptyCart = () => null;
-
-/*
 import React from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/Button';
@@ -40,4 +23,3 @@ export const EmptyCart: React.FC = () => {
     </div>
   );
 };
-*/
