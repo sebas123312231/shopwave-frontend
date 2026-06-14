@@ -18,7 +18,7 @@ interface CartContextType {
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
-const CART_TIMEOUT = 8000;
+const CART_TIMEOUT = 60000;
 
 function recalcCart(cart: Cart): Cart {
   let totalPrice = 0;
