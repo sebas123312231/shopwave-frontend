@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Package, ClipboardList, TrendingUp, AlertCircle } from 'lucide-react';
+import { Package, ClipboardList, TrendingUp, AlertCircle, Shield } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/Button';
 import { Spinner } from '@/components/ui/Spinner';
@@ -129,7 +129,10 @@ export default function AdminPage() {
     <AdminGuard>
     <div className="max-w-6xl mx-auto px-4 md:px-8 py-6 md:py-8">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-foreground tracking-tight">Panel de Administración</h1>
+        <div className="flex items-center gap-3">
+          <Shield size={28} className="text-accent" />
+          <h1 className="text-3xl font-bold text-foreground tracking-tight">Panel de Administración</h1>
+        </div>
         <p className="mt-2 text-foreground-muted">Gestiona productos y monitorea el rendimiento de tu tienda.</p>
       </div>
 

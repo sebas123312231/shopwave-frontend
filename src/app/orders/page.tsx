@@ -11,7 +11,7 @@ import { ClipboardList, ShoppingBag, AlertCircle } from 'lucide-react';
 import Link from 'next/link';
 
 const EmptyOrders = () => (
-  <div className="flex flex-col items-center justify-center py-16 px-4 animate-fadeIn">
+  <div className="flex flex-col items-center justify-center text-center py-16 px-4 bg-surface rounded-2xl border-2 border-dashed border-border max-w-md mx-auto animate-fadeIn">
     <div className="h-24 w-24 rounded-2xl bg-background-alt flex items-center justify-center mb-6">
       <ClipboardList size={48} className="text-foreground-muted" />
     </div>
@@ -65,7 +65,10 @@ export default function OrdersPage() {
   return (
     <AuthGuard>
       <div className="max-w-5xl mx-auto px-4 py-8 md:py-12 min-h-screen">
-        <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-8">Mis Órdenes</h1>
+        <div className="flex items-center gap-3 mb-8">
+          <ClipboardList size={28} className="text-accent" />
+          <h1 className="text-3xl md:text-4xl font-bold text-foreground">Mis Órdenes</h1>
+        </div>
 
         {loading ? (
           <div className="flex justify-center items-center py-24">
