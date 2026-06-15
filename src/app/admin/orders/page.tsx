@@ -125,17 +125,19 @@ export default function AdminOrdersPage() {
   return (
     <AdminGuard>
       <div className="max-w-7xl mx-auto p-6 lg:p-8">
-        <Link
-          href="/admin"
-          className="inline-flex items-center gap-2 text-sm font-semibold text-accent hover:text-accent-dark transition-colors mb-6"
-        >
-          <ChevronLeft size={18} />
-          Volver al panel de administración
-        </Link>
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-foreground tracking-tight">Gestión de Órdenes</h1>
-        <p className="mt-2 text-foreground-muted">Administra y rastrea todas las órdenes de tu tienda.</p>
-      </div>
+        <div className="bg-background-alt border border-border rounded-2xl p-6 md:p-8 mb-8">
+          <Link
+            href="/admin"
+            className="inline-flex items-center gap-2 text-sm font-semibold text-accent hover:text-accent-dark transition-colors mb-6"
+          >
+            <ChevronLeft size={18} />
+            Volver al panel de administración
+          </Link>
+          <div>
+            <h1 className="text-3xl font-bold text-foreground tracking-tight">Gestión de Órdenes</h1>
+            <p className="mt-2 text-foreground-muted">Administra y rastrea todas las órdenes de tu tienda.</p>
+          </div>
+        </div>
 
       {error && (
         <div className="mb-6 p-4 rounded-xl bg-error/10 border border-error/20 text-error text-sm">
