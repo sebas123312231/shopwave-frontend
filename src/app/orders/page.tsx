@@ -6,7 +6,7 @@ import { OrderService } from '@/services/order.service';
 import { Order } from '@/models/order.model';
 import { OrderList } from '@/components/orders/OrderList';
 import { Spinner } from '@/components/ui/Spinner';
-import { ClipboardList, ShoppingBag, AlertCircle, RefreshCw } from 'lucide-react';
+import { ClipboardList, ShoppingBag, AlertCircle } from 'lucide-react';
 import Link from 'next/link';
 
 const POLL_INTERVAL_MS = 3000;
@@ -34,53 +34,30 @@ export default function OrdersPage() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [refreshing, setRefreshing] = useState(false);
-  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const isMountedRef = useRef(true);
-
-  const loadOrders = useCallback(async (silent = false) => {
-    if (silent) {
-      setRefreshing(true);
-    } else {
-      setLoading(true);
-      setError(null);
-    }
-    try {
-      const data = await OrderService.getUserOrders();
-      if (!isMountedRef.current) return;
-      setOrders(data || []);
-      setError(null);
-      setLastUpdated(new Date());
-    } catch (err: unknown) {
-      if (!isMountedRef.current) return;
-      if (!silent) {
-        setError(err instanceof Error ? err.message : 'Error al obtener las órdenes');
-      }
-    } finally {
-      if (isMountedRef.current) {
-        setLoading(false);
-        setRefreshing(false);
-      }
-    }
-  }, []);
 
   useEffect(() => {
     isMountedRef.current = true;
+    const initialDoneRef = { current: false };
 
-    const initialFetch = async () => {
+    const silentFetch = async () => {
       try {
         const data = await OrderService.getUserOrders();
         if (!isMountedRef.current) return;
         setOrders(data || []);
-        setLastUpdated(new Date());
+        setError(null);
       } catch (err: unknown) {
         if (!isMountedRef.current) return;
-        setError(err instanceof Error ? err.message : 'Error al obtener las órdenes');
+        if (!initialDoneRef.current) {
+          setError(err instanceof Error ? err.message : 'Error al obtener las órdenes');
+        }
       } finally {
+        initialDoneRef.current = true;
         if (isMountedRef.current) setLoading(false);
       }
     };
-    initialFetch();
+
+    silentFetch();
 
     let interval: ReturnType<typeof setInterval> | null = null;
 
@@ -88,7 +65,7 @@ export default function OrdersPage() {
       if (interval) return;
       interval = setInterval(() => {
         if (!document.hidden) {
-          loadOrders(true);
+          silentFetch();
         }
       }, POLL_INTERVAL_MS);
     };
@@ -105,7 +82,7 @@ export default function OrdersPage() {
         stop();
       } else {
         start();
-        loadOrders(true);
+        silentFetch();
       }
     };
 
@@ -117,7 +94,12 @@ export default function OrdersPage() {
       stop();
       document.removeEventListener('visibilitychange', onVisibility);
     };
-  }, [loadOrders]);
+  }, []);
+
+  const handleRetry = useCallback(() => {
+    setLoading(true);
+    setError(null);
+  }, []);
 
   useEffect(() => {
     if (loading) {
@@ -134,30 +116,9 @@ export default function OrdersPage() {
   return (
     <AuthGuard>
       <div className="max-w-5xl mx-auto px-4 md:px-8 py-8 md:py-12 min-h-screen">
-        <div className="flex items-center justify-between gap-3 mb-8 flex-wrap">
-          <div className="flex items-center gap-3">
-            <ClipboardList size={28} className="text-accent" />
-            <h1 className="text-3xl md:text-4xl font-bold text-foreground">Mis Órdenes</h1>
-          </div>
-          <div className="flex items-center gap-3 text-xs text-foreground-muted">
-            {refreshing && (
-              <RefreshCw size={14} className="animate-spin" />
-            )}
-            {lastUpdated && !loading && (
-              <span>
-                Actualizado {lastUpdated.toLocaleTimeString('es-BO', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
-              </span>
-            )}
-            <button
-              onClick={() => loadOrders(true)}
-              disabled={refreshing || loading}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border bg-surface text-foreground hover:bg-background-alt transition-colors disabled:opacity-50"
-              aria-label="Actualizar órdenes"
-            >
-              <RefreshCw size={12} />
-              Actualizar
-            </button>
-          </div>
+        <div className="flex items-center gap-3 mb-8">
+          <ClipboardList size={28} className="text-accent" />
+          <h1 className="text-3xl md:text-4xl font-bold text-foreground">Mis Órdenes</h1>
         </div>
 
         {loading ? (
@@ -171,7 +132,7 @@ export default function OrdersPage() {
               <p className="font-semibold">Error al cargar órdenes</p>
               <p className="mt-1">{error}</p>
               <button
-                onClick={() => loadOrders(false)}
+                onClick={handleRetry}
                 className="mt-3 text-accent hover:text-accent-dark font-medium text-sm"
               >
                 Reintentar

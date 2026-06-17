@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Search, CheckCircle, Truck, Package, XCircle, Trash2, Eye, ChevronLeft } from 'lucide-react';
+import { CheckCircle, Truck, Package, XCircle, Trash2, Eye, ChevronLeft } from 'lucide-react';
 import { Badge } from '@/components/ui/Badge';
 import { Select } from '@/components/ui/Select';
 import { Spinner } from '@/components/ui/Spinner';
@@ -46,7 +46,6 @@ export default function AdminOrdersPage() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [deleteModal, setDeleteModal] = useState<{ isOpen: boolean; order: Order | null }>({
     isOpen: false,
@@ -117,10 +116,8 @@ export default function AdminOrdersPage() {
   };
 
   const filteredOrders = orders.filter((o) => {
-    const matchesSearch = (o.orderId || `#${o.id}`).toLowerCase().includes(searchTerm.toLowerCase()) ||
-      o.user?.email?.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = !statusFilter || o.orderStatus === statusFilter;
-    return matchesSearch && matchesStatus;
+    return matchesStatus;
   });
 
   return (
@@ -148,16 +145,6 @@ export default function AdminOrdersPage() {
 
       <div className="rounded-2xl bg-surface border border-border shadow-sm">
         <div className="p-4 border-b border-border flex flex-col md:flex-row gap-4">
-          <div className="relative flex-1 max-w-md">
-            <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-foreground-muted" />
-            <input
-              type="text"
-              placeholder="Buscar por orden o cliente..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full rounded-xl border border-border bg-background-alt pl-10 pr-4 py-2.5 text-sm outline-none transition focus:border-accent focus:bg-surface focus:ring-2 focus:ring-accent/20"
-            />
-          </div>
           <Select
             options={statusOptions}
             value={statusFilter}
