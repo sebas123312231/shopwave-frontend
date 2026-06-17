@@ -22,10 +22,7 @@ export interface Address {
 }
 
 export interface PaymentInformation {
-  id: number;
-  cardNumber: string;
   cardholderName: string;
-  expiryDate: string;
-  cvv: string;
+  cardNumber: string;
   paymentMethod: string;
 }
