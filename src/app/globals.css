@@ -4,9 +4,9 @@
   --color-primary: #0f172a;
   --color-primary-light: #1e293b;
   --color-primary-dark: #020617;
-  --color-accent: #3b82f6;
-  --color-accent-light: #60a5fa;
-  --color-accent-dark: #2563eb;
+  --color-accent: #9d4edd;
+  --color-accent-light: #c77dff;
+  --color-accent-dark: #7b2cbf;
   --color-background: #f8fafc;
   --color-background-alt: #f1f5f9;
   --color-surface: #ffffff;
@@ -17,12 +17,12 @@
   --color-success: #22c55e;
   --color-warning: #f59e0b;
   --color-error: #ef4444;
-  --color-surface-blue: #dbeafe;
+  --color-surface-blue: #f3e8ff;
   --color-surface-red: #fef2f2;
   --color-surface-green: #f0fdf4;
   --color-text-on-red: #b91c1c;
   --color-text-on-green: #15803d;
-  --color-text-on-blue: #1d4ed8;
+  --color-text-on-blue: #7b2cbf;
   --color-surface-amber: #fffbeb;
   --color-text-on-amber: #92400e;
   --color-border-amber: #fde68a;
@@ -31,7 +31,7 @@
   --color-border-purple: #e9d5ff;
   --color-border-red: #fecaca;
   --color-border-green: #bbf7d0;
-  --color-border-blue: #bfdbfe;
+  --color-border-blue: #e0aaff;
 
   --animate-fadeIn: fadeIn 0.3s ease-out forwards;
   --animate-slideUp: slideUp 0.4s ease-out forwards;
@@ -45,9 +45,9 @@
   --color-primary: #0f172a;
   --color-primary-light: #1e293b;
   --color-primary-dark: #020617;
-  --color-accent: #60a5fa;
-  --color-accent-light: #93c5fd;
-  --color-accent-dark: #3b82f6;
+  --color-accent: #c77dff;
+  --color-accent-light: #e0aaff;
+  --color-accent-dark: #9d4edd;
   --color-background: #0f172a;
   --color-background-alt: #1e293b;
   --color-surface: #1e293b;
@@ -58,12 +58,12 @@
   --color-success: #4ade80;
   --color-warning: #fbbf24;
   --color-error: #f87171;
-  --color-surface-blue: #1e3a5f;
+  --color-surface-blue: #3a1f5e;
   --color-surface-red: #3b1c1c;
   --color-surface-green: #1a3a2a;
   --color-text-on-red: #fca5a5;
   --color-text-on-green: #86efac;
-  --color-text-on-blue: #93c5fd;
+  --color-text-on-blue: #e0aaff;
   --color-surface-amber: #3b2f10;
   --color-text-on-amber: #fcd34d;
   --color-border-amber: #5c4813;
@@ -72,7 +72,7 @@
   --color-border-purple: #4a2570;
   --color-border-red: #5c2020;
   --color-border-green: #2d5a3d;
-  --color-border-blue: #1e3a5f;
+  --color-border-blue: #4a2570;
 }
 
 /* Smooth transition when switching themes */

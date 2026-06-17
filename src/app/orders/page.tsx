@@ -22,7 +22,7 @@ const EmptyOrders = () => (
     </p>
     <Link
       href="/products"
-      className="inline-flex items-center gap-2 bg-accent text-white px-6 py-3 rounded-xl font-semibold hover:bg-accent-dark transition-all hover:shadow-lg hover:shadow-blue-500/25"
+      className="inline-flex items-center gap-2 bg-accent text-white px-6 py-3 rounded-xl font-semibold hover:bg-accent-dark transition-all hover:shadow-lg hover:shadow-purple-500/25"
     >
       <ShoppingBag size={18} />
       Explorar productos

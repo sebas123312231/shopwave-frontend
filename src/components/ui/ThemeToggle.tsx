@@ -18,8 +18,8 @@ export const ThemeToggle = () => {
       title={dark ? 'Modo claro' : 'Modo oscuro'}
       className={`relative inline-flex h-8 w-[60px] shrink-0 items-center overflow-hidden rounded-full p-1 shadow-inner transition-all duration-300 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60 ${
         dark
-          ? 'bg-gradient-to-r from-slate-800 to-indigo-950'
-          : 'bg-gradient-to-r from-sky-300 to-sky-400'
+          ? 'bg-gradient-to-r from-slate-800 to-purple-950'
+          : 'bg-gradient-to-r from-purple-300 to-purple-400'
       }`}
     >
       {/* Estrellas decorativas (modo oscuro) */}

@@ -34,7 +34,7 @@ export default function HomePage() {
       <section
         className="relative overflow-hidden rounded-3xl mx-4 mt-4 md:mx-8 md:mt-8 min-h-[480px] md:min-h-[560px] flex items-center bg-primary"
         style={{
-          backgroundImage: `linear-gradient(to right, rgba(15, 23, 42, 0.92) 0%, rgba(15, 23, 42, 0.75) 50%, rgba(30, 58, 95, 0.6) 100%), url(${HERO_IMAGE})`,
+          backgroundImage: `linear-gradient(to right, rgba(15, 23, 42, 0.92) 0%, rgba(15, 23, 42, 0.75) 50%, rgba(60, 30, 95, 0.6) 100%), url(${HERO_IMAGE})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
         }}
@@ -44,7 +44,7 @@ export default function HomePage() {
 
         <div className="relative z-10 px-8 md:px-16 py-12 max-w-2xl">
           <div className="animate-slideUp">
-            <span className="inline-flex items-center gap-2 text-sm uppercase tracking-[0.25em] text-blue-300/80 mb-4">
+            <span className="inline-flex items-center gap-2 text-sm uppercase tracking-[0.25em] text-purple-300/80 mb-4">
               <Sparkles size={16} />
               Nueva colección
             </span>
@@ -58,7 +58,7 @@ export default function HomePage() {
           </h1>
 
           <p
-            className="animate-slideUp text-lg text-blue-100/80 max-w-xl mb-8"
+            className="animate-slideUp text-lg text-purple-100/80 max-w-xl mb-8"
             style={{ animationDelay: '200ms' }}
           >
             Explora el catálogo completo con filtros por precio, categoría y descuento para comprar más rápido.
@@ -67,7 +67,7 @@ export default function HomePage() {
           <div className="animate-slideUp" style={{ animationDelay: '300ms' }}>
             <Link
               href="/products"
-              className="inline-flex items-center gap-2 bg-accent text-white px-8 py-4 rounded-xl text-base font-semibold hover:bg-accent-dark transition-all hover:shadow-lg hover:shadow-blue-500/30 hover:scale-[1.02] active:scale-[0.98]"
+              className="inline-flex items-center gap-2 bg-accent text-white px-8 py-4 rounded-xl text-base font-semibold hover:bg-accent-dark transition-all hover:shadow-lg hover:shadow-purple-500/30 hover:scale-[1.02] active:scale-[0.98]"
             >
               Ver catálogo
               <ArrowRight size={20} />
