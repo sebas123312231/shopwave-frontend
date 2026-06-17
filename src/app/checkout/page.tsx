@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { AuthGuard } from '@/guards/AuthGuard';
 import { AddressForm } from '@/components/forms/AddressForm';
 import { AddressBook } from '@/components/forms/AddressBook';
+import { PaymentBook } from '@/components/forms/PaymentBook';
 import { CheckoutForm } from '@/components/forms/CheckoutForm';
 import { Button } from '@/components/ui/Button';
 import { Spinner } from '@/components/ui/Spinner';
@@ -12,7 +13,7 @@ import { useCart } from '@/hooks/useCart';
 import { OrderService } from '@/services/order.service';
 import { UserService } from '@/services/user.service';
 import { CreateOrderRequest, PaymentMethod, PaymentStatus } from '@/models/order.model';
-import { Address, User } from '@/models/user.model';
+import { Address, PaymentInformation, User } from '@/models/user.model';
 import { AlertCircle, CheckCircle, MapPin, ShoppingBag } from 'lucide-react';
 
 const paymentMethodOptions: { value: string; label: string }[] = [
@@ -39,6 +40,14 @@ const addressesEqual = (a: Address, b: typeof EMPTY_ADDRESS): boolean =>
 const sortByLastUsed = (addresses: Address[]): Address[] =>
   [...addresses].sort((a, b) => b.id - a.id);
 
+const paymentKey = (p: { cardNumber?: string; paymentMethod?: string }): string =>
+  `${(p.cardNumber || '').replace(/\s+/g, '')}-${p.paymentMethod || ''}`;
+
+const paymentsEqual = (
+  a: { cardNumber?: string; paymentMethod?: string },
+  b: { cardNumber: string; paymentMethod: string },
+): boolean => paymentKey(a) === paymentKey(b);
+
 export default function CheckoutPage() {
   const router = useRouter();
   const { cart, refreshCart } = useCart();
@@ -61,8 +70,10 @@ export default function CheckoutPage() {
   });
 
   const [checkoutErrors, setCheckoutErrors] = useState<Record<string, string>>({});
+  const [selectedPaymentKey, setSelectedPaymentKey] = useState<string | null>(null);
 
   const sortedAddresses = profile?.addresses ? sortByLastUsed(profile.addresses) : [];
+  const sortedPayments: PaymentInformation[] = profile?.paymentInformation ?? [];
 
   useEffect(() => {
     let active = true;
@@ -131,9 +142,42 @@ export default function CheckoutPage() {
     }
   };
 
+  const handleSelectPayment = (payment: PaymentInformation) => {
+    setSelectedPaymentKey(paymentKey(payment));
+    setCheckoutData({
+      paymentMethod: (payment.paymentMethod || 'CREDIT_CARD') as PaymentMethod,
+      cardholderName: payment.cardholderName || '',
+      cardNumber: payment.cardNumber || '',
+    });
+    setCheckoutErrors({});
+  };
+
+  const handleUseNewPayment = () => {
+    setSelectedPaymentKey(null);
+    setCheckoutData((prev) => ({
+      paymentMethod: prev.paymentMethod,
+      cardholderName: profile ? `${profile.firstName} ${profile.lastName}`.trim() : prev.cardholderName,
+      cardNumber: '',
+    }));
+    setCheckoutErrors((prev) => {
+      const next = { ...prev };
+      delete next.cardNumber;
+      return next;
+    });
+  };
+
   const handleCheckoutChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setCheckoutData((prev) => ({ ...prev, [name]: value }));
+    setCheckoutData((prev) => {
+      const nextData = { ...prev, [name]: value };
+      if (name === 'cardNumber' || name === 'paymentMethod') {
+        const matchKey = sortedPayments.find((p) => paymentsEqual(p, nextData))
+          ? paymentKey(nextData)
+          : null;
+        setSelectedPaymentKey(matchKey);
+      }
+      return nextData;
+    });
     if (checkoutErrors[name]) {
       setCheckoutErrors((prev) => {
         const next = { ...prev };
@@ -171,8 +215,14 @@ export default function CheckoutPage() {
   };
 
   const handleConfirm = async () => {
-    if (!validateAddress() || !validateCheckout()) {
+    const addressValid = validateAddress();
+    const checkoutValid = validateCheckout();
+
+    if (!addressValid) {
       setStep(1);
+      return;
+    }
+    if (!checkoutValid) {
       return;
     }
 
@@ -305,14 +355,24 @@ export default function CheckoutPage() {
         )}
 
         {step === 2 && (
-          <div className="bg-surface border border-border rounded-2xl shadow-lg p-6 md:p-8 animate-slideUp">
-            <CheckoutForm
-              formData={checkoutData}
-              onChange={handleCheckoutChange}
-              errors={checkoutErrors}
-              options={paymentMethodOptions}
+          <div className="bg-surface border border-border rounded-2xl shadow-lg p-6 md:p-8 animate-slideUp space-y-6">
+            <PaymentBook
+              payments={sortedPayments}
+              selectedKey={selectedPaymentKey}
+              onSelect={handleSelectPayment}
+              onUseNew={handleUseNewPayment}
             />
-            <div className="flex justify-between mt-6">
+
+            <div className={sortedPayments.length > 0 ? 'border-t border-border pt-6' : ''}>
+              <CheckoutForm
+                formData={checkoutData}
+                onChange={handleCheckoutChange}
+                errors={checkoutErrors}
+                options={paymentMethodOptions}
+              />
+            </div>
+
+            <div className="flex justify-between">
               <Button variant="secondary" onClick={handleBack}>
                 Volver
               </Button>
