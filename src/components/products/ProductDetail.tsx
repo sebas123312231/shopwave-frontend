@@ -15,6 +15,17 @@ interface ProductDetailProps {
   product: Product;
 }
 
+const computeSizeMaxQty = (
+  product: Product,
+  sizeName: string,
+  cartQtyForSize: number,
+): number => {
+  const sizeObj = product.sizes?.find((s) => s.name === sizeName);
+  if (!sizeObj) return 0;
+  const remaining = Math.max(0, sizeObj.quantity - cartQtyForSize);
+  return Math.min(MAX_PER_PRODUCT, remaining);
+};
+
 export const ProductDetail = ({ product }: ProductDetailProps) => {
   const { isAuthenticated, isLoading: authLoading } = useAuth();
   const { addItem, removeItem, cart } = useCart();
@@ -25,7 +36,6 @@ export const ProductDetail = ({ product }: ProductDetailProps) => {
   );
 
   const isOutOfStock = product.quantity <= 0;
-  const maxQty = Math.min(MAX_PER_PRODUCT, product.quantity);
 
   const [selectedSize, setSelectedSize] = useState<string>(availableSizes[0] ?? '');
   const [quantity, setQuantity] = useState(1);
@@ -37,6 +47,25 @@ export const ProductDetail = ({ product }: ProductDetailProps) => {
     [cart, product.id, selectedSize],
   );
   const isInCart = !!cartItem;
+
+  const selectedSizeObj = useMemo(
+    () => product.sizes?.find((s) => s.name === selectedSize),
+    [product.sizes, selectedSize],
+  );
+
+  const alreadyInCartForSize = cartItem?.quantity ?? 0;
+
+  const sizeMaxQty = useMemo(
+    () => computeSizeMaxQty(product, selectedSize, alreadyInCartForSize),
+    [product, selectedSize, alreadyInCartForSize],
+  );
+
+  const handleSelectSize = (size: string) => {
+    setSelectedSize(size);
+    const cartQty = cart?.cartItems?.find((ci) => ci.product.id === product.id && ci.size === size)?.quantity ?? 0;
+    const newMax = Math.max(1, computeSizeMaxQty(product, size, cartQty));
+    setQuantity((prev) => Math.min(Math.max(1, prev), newMax));
+  };
 
   const handleAddToCart = async () => {
     if (!selectedSize || isOutOfStock) return;
@@ -109,19 +138,31 @@ export const ProductDetail = ({ product }: ProductDetailProps) => {
           <div className="space-y-3">
             <p className="text-sm font-semibold text-foreground">Tallas disponibles</p>
             <div className="flex flex-wrap gap-2">
-              {availableSizes.map((size) => (
-                <button
-                  key={size}
-                  onClick={() => setSelectedSize(size)}
-                  className={`rounded-xl border px-4 py-2.5 text-sm font-medium transition-all ${
-                    selectedSize === size
-                      ? 'border-accent bg-accent/10 text-accent'
-                      : 'border-border bg-surface text-foreground hover:border-accent/50'
-                  }`}
-                >
-                  {size}
-                </button>
-              ))}
+              {availableSizes.map((size) => {
+                const sizeObj = product.sizes?.find((s) => s.name === size);
+                const sizeQty = sizeObj?.quantity ?? 0;
+                const isLowStock = sizeQty > 0 && sizeQty <= 3;
+                return (
+                  <button
+                    key={size}
+                    onClick={() => handleSelectSize(size)}
+                    className={`relative rounded-xl border px-4 py-2.5 text-sm font-medium transition-all ${
+                      selectedSize === size
+                        ? 'border-accent bg-accent/10 text-accent'
+                        : 'border-border bg-surface text-foreground hover:border-accent/50'
+                    }`}
+                  >
+                    {size}
+                    <span
+                      className={`ml-1.5 text-[10px] font-normal ${
+                        isLowStock ? 'text-warning' : 'text-foreground-muted'
+                      }`}
+                    >
+                      ({sizeQty})
+                    </span>
+                  </button>
+                );
+              })}
             </div>
           </div>
         )}
@@ -131,6 +172,14 @@ export const ProductDetail = ({ product }: ProductDetailProps) => {
           <span className={`font-semibold ${isOutOfStock ? 'text-error' : 'text-foreground'}`}>
             {product.quantity}
           </span>
+          {selectedSizeObj && (
+            <span className="text-foreground-muted">
+              · Talla <span className="font-semibold text-foreground">{selectedSize}</span>: {selectedSizeObj.quantity}
+              {alreadyInCartForSize > 0 && (
+                <span className="text-warning"> (ya tienes {alreadyInCartForSize} en el carrito)</span>
+              )}
+            </span>
+          )}
         </div>
 
         {!authLoading && !isAuthenticated && (
@@ -155,18 +204,23 @@ export const ProductDetail = ({ product }: ProductDetailProps) => {
                 onClick={() => setQuantity(Math.max(1, quantity - 1))}
                 className="px-3 py-2 text-foreground hover:bg-background-alt transition-colors"
                 disabled={quantity <= 1 || isInCart}
+                aria-label="Disminuir cantidad"
               >
                 <Minus size={16} />
               </button>
               <span className="px-4 py-2 font-medium text-sm min-w-[3rem] text-center text-foreground">{quantity}</span>
               <button
-                onClick={() => setQuantity(Math.min(maxQty, quantity + 1))}
+                onClick={() => setQuantity(Math.min(sizeMaxQty, quantity + 1))}
                 className="px-3 py-2 text-foreground hover:bg-background-alt transition-colors"
-                disabled={quantity >= maxQty || isInCart}
+                disabled={quantity >= sizeMaxQty || isInCart}
+                aria-label="Aumentar cantidad"
               >
                 <Plus size={16} />
               </button>
             </div>
+            <span className="text-xs text-foreground-muted">
+              Máx: {sizeMaxQty} para talla {selectedSize}
+            </span>
 
             {isInCart ? (
               <Button
@@ -179,7 +233,13 @@ export const ProductDetail = ({ product }: ProductDetailProps) => {
                 <Trash2 size={20} /> Quitar del carrito
               </Button>
             ) : (
-              <Button size="lg" onClick={handleAddToCart} loading={adding} disabled={!selectedSize} className="flex-1 sm:flex-none">
+              <Button
+                size="lg"
+                onClick={handleAddToCart}
+                loading={adding}
+                disabled={!selectedSize || sizeMaxQty < 1}
+                className="flex-1 sm:flex-none"
+              >
                 <ShoppingCart size={20} /> Agregar al carrito
               </Button>
             )}
