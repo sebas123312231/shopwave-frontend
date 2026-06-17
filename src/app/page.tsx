@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { ArrowRight, Sparkles } from 'lucide-react';
 import { ProductService } from '@/services/product.service';
 import { Product } from '@/models/product.model';
-import { ProductList } from '@/components/products/ProductList';
+import { FeaturedMarquee } from '@/components/products/FeaturedMarquee';
 
 const HERO_IMAGE = 'https://img.pikbest.com/ai/illus_our/20230427/6bec2b604cd4efc90ea8265ea5eafe61.jpg!bw800';
 
@@ -89,7 +89,7 @@ export default function HomePage() {
         </div>
 
         <div className="animate-fadeIn">
-          <ProductList
+          <FeaturedMarquee
             products={products}
             loading={isLoading}
             error={error || null}
