@@ -1,6 +1,15 @@
 import { getToken, removeToken, isTokenExpired } from '@/utils/token.util';
 
-const API_PREFIX = '/api';
+const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? '';
+
+function assertApiBase(): void {
+  if (!API_BASE) {
+    throw new Error(
+      'NEXT_PUBLIC_API_URL no está configurada. Defínela en .env.local (desarrollo) ' +
+        'o en las variables de entorno de Vercel (producción).',
+    );
+  }
+}
 
 function parseJsonSafe(text: string): unknown {
   let trimmed = text.trim();
@@ -107,7 +116,8 @@ function extractTokenFromBody(data: unknown): string | null {
 
 export const api = {
   get: async <T>(url: string, requireAuth = false): Promise<T> => {
-    const response = await fetch(`${API_PREFIX}${url}`, {
+    assertApiBase();
+    const response = await fetch(`${API_BASE}${url}`, {
       method: 'GET',
       headers: getHeaders(requireAuth),
       cache: 'no-store',
@@ -116,7 +126,8 @@ export const api = {
   },
 
   post: async <T>(url: string, body: unknown, requireAuth = false): Promise<T> => {
-    const response = await fetch(`${API_PREFIX}${url}`, {
+    assertApiBase();
+    const response = await fetch(`${API_BASE}${url}`, {
       method: 'POST',
       headers: getHeaders(requireAuth),
       body: JSON.stringify(body),
@@ -125,7 +136,8 @@ export const api = {
   },
 
   put: async <T>(url: string, body: unknown, requireAuth = false): Promise<T> => {
-    const response = await fetch(`${API_PREFIX}${url}`, {
+    assertApiBase();
+    const response = await fetch(`${API_BASE}${url}`, {
       method: 'PUT',
       headers: getHeaders(requireAuth),
       body: JSON.stringify(body),
@@ -134,7 +146,8 @@ export const api = {
   },
 
   del: async <T>(url: string, requireAuth = false): Promise<T> => {
-    const response = await fetch(`${API_PREFIX}${url}`, {
+    assertApiBase();
+    const response = await fetch(`${API_BASE}${url}`, {
       method: 'DELETE',
       headers: getHeaders(requireAuth),
     });
@@ -142,8 +155,9 @@ export const api = {
   },
 
   loginBasic: async (email: string, password: string): Promise<string> => {
+    assertApiBase();
     const basic = btoa(`${email}:${password}`);
-    const response = await fetch(`${API_PREFIX}/auth/signin`, {
+    const response = await fetch(`${API_BASE}/auth/signin`, {
       method: 'GET',
       headers: {
         Authorization: `Basic ${basic}`,
