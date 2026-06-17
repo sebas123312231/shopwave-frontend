@@ -107,6 +107,9 @@ export const Sidebar = () => {
             ShopWave
           </Link>
           <div className="flex items-center gap-2">
+            <div className="hidden md:block">
+              <ThemeToggle />
+            </div>
             <button
               onClick={() => setIsOpen(false)}
               className="flex h-9 w-9 items-center justify-center rounded-lg text-white/60 hover:text-white hover:bg-white/10 transition-colors md:hidden"
