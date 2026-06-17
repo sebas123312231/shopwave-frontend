@@ -1,14 +1,18 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { AuthGuard } from '@/guards/AuthGuard';
 import { AddressForm } from '@/components/forms/AddressForm';
+import { AddressBook } from '@/components/forms/AddressBook';
 import { CheckoutForm } from '@/components/forms/CheckoutForm';
 import { Button } from '@/components/ui/Button';
+import { Spinner } from '@/components/ui/Spinner';
 import { useCart } from '@/hooks/useCart';
 import { OrderService } from '@/services/order.service';
+import { UserService } from '@/services/user.service';
 import { CreateOrderRequest, PaymentMethod, PaymentStatus } from '@/models/order.model';
+import { Address, User } from '@/models/user.model';
 import { AlertCircle, CheckCircle, MapPin, ShoppingBag } from 'lucide-react';
 
 const paymentMethodOptions: { value: string; label: string }[] = [
@@ -16,6 +20,24 @@ const paymentMethodOptions: { value: string; label: string }[] = [
   { value: 'DEBIT_CARD', label: 'Tarjeta de Débito' },
   { value: 'PAYPAL', label: 'PayPal' },
 ];
+
+const EMPTY_ADDRESS = {
+  firstName: '',
+  lastName: '',
+  streetAddress: '',
+  state: '',
+  zipCode: '',
+  mobile: '',
+};
+
+const addressesEqual = (a: Address, b: typeof EMPTY_ADDRESS): boolean =>
+  a.streetAddress.trim().toLowerCase() === (b.streetAddress || '').trim().toLowerCase()
+  && a.state.trim().toLowerCase() === (b.state || '').trim().toLowerCase()
+  && a.zipCode.trim() === (b.zipCode || '').trim()
+  && a.mobile.trim() === (b.mobile || '').trim();
+
+const sortByLastUsed = (addresses: Address[]): Address[] =>
+  [...addresses].sort((a, b) => b.id - a.id);
 
 export default function CheckoutPage() {
   const router = useRouter();
@@ -25,15 +47,11 @@ export default function CheckoutPage() {
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [orderCompleted, setOrderCompleted] = useState(false);
 
-  const [addressData, setAddressData] = useState({
-    firstName: '',
-    lastName: '',
-    streetAddress: '',
-    state: '',
-    zipCode: '',
-    mobile: '',
-  });
+  const [profile, setProfile] = useState<User | null>(null);
+  const [profileLoading, setProfileLoading] = useState(true);
+  const [selectedAddressId, setSelectedAddressId] = useState<number | null>(null);
 
+  const [addressData, setAddressData] = useState(EMPTY_ADDRESS);
   const [addressErrors, setAddressErrors] = useState<Record<string, string>>({});
 
   const [checkoutData, setCheckoutData] = useState({
@@ -44,9 +62,66 @@ export default function CheckoutPage() {
 
   const [checkoutErrors, setCheckoutErrors] = useState<Record<string, string>>({});
 
+  const sortedAddresses = profile?.addresses ? sortByLastUsed(profile.addresses) : [];
+
+  useEffect(() => {
+    let active = true;
+    UserService.getProfile()
+      .then((user) => {
+        if (!active) return;
+        setProfile(user);
+        if (user.firstName) {
+          setAddressData((prev) => ({
+            ...prev,
+            firstName: user.firstName || prev.firstName,
+            lastName: user.lastName || prev.lastName,
+            mobile: user.mobile || prev.mobile,
+          }));
+        }
+      })
+      .catch(() => {
+        /* silent - user can still type in manually */
+      })
+      .finally(() => {
+        if (active) setProfileLoading(false);
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  const handleSelectAddress = (address: Address) => {
+    setSelectedAddressId(address.id);
+    setAddressData({
+      firstName: address.firstName,
+      lastName: address.lastName,
+      streetAddress: address.streetAddress,
+      state: address.state,
+      zipCode: address.zipCode,
+      mobile: address.mobile,
+    });
+    setAddressErrors({});
+  };
+
+  const handleUseNewAddress = () => {
+    setSelectedAddressId(null);
+    setAddressData({
+      ...EMPTY_ADDRESS,
+      firstName: profile?.firstName ?? '',
+      lastName: profile?.lastName ?? '',
+      mobile: profile?.mobile ?? '',
+    });
+    setAddressErrors({});
+  };
+
   const handleAddressChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setAddressData((prev) => ({ ...prev, [name]: value }));
+    setAddressData((prev) => {
+      const next = { ...prev, [name]: value };
+      const matchId = sortedAddresses.find((a) => addressesEqual(a, next))?.id ?? null;
+      setSelectedAddressId(matchId);
+      return next;
+    });
     if (addressErrors[name]) {
       setAddressErrors((prev) => {
         const next = { ...prev };
@@ -194,17 +269,34 @@ export default function CheckoutPage() {
         )}
 
         {step === 1 && (
-          <div className="bg-surface border border-border rounded-2xl shadow-lg p-6 md:p-8 animate-slideUp">
-            <div className="flex items-center gap-2 mb-4">
+          <div className="bg-surface border border-border rounded-2xl shadow-lg p-6 md:p-8 animate-slideUp space-y-6">
+            <div className="flex items-center gap-2">
               <MapPin size={20} className="text-accent" />
               <h2 className="text-lg font-bold text-foreground">Información de Envío</h2>
             </div>
-            <AddressForm
-              formData={addressData}
-              onChange={handleAddressChange}
-              errors={addressErrors}
-            />
-            <div className="flex justify-end mt-6">
+
+            {profileLoading ? (
+              <div className="flex items-center justify-center py-8">
+                <Spinner size="md" />
+              </div>
+            ) : (
+              <AddressBook
+                addresses={sortedAddresses}
+                selectedId={selectedAddressId}
+                onSelect={handleSelectAddress}
+                onUseNew={handleUseNewAddress}
+              />
+            )}
+
+            <div className="border-t border-border pt-6">
+              <AddressForm
+                formData={addressData}
+                onChange={handleAddressChange}
+                errors={addressErrors}
+              />
+            </div>
+
+            <div className="flex justify-end">
               <Button size="lg" onClick={handleNext}>
                 Continuar al Pago
               </Button>
