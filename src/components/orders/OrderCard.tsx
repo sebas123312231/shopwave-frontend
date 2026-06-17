@@ -2,17 +2,14 @@ import Link from 'next/link';
 import { Order } from '@/models/order.model';
 import { OrderStatusBadge } from './OrderStatusBadge';
 import { ArrowRight } from 'lucide-react';
+import { formatBoliviaDate } from '@/utils/datetime.util';
 
 interface OrderCardProps {
   order: Order;
 }
 
 export function OrderCard({ order }: OrderCardProps) {
-  const formattedDate = new Date(order.orderDate).toLocaleDateString('es-BO', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  });
+  const formattedDate = formatBoliviaDate(order.orderDate);
 
   const formatPrice = (price: number) =>
     new Intl.NumberFormat('es-BO', { style: 'currency', currency: 'BOB' }).format(price);

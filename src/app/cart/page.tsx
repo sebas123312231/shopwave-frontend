@@ -30,7 +30,7 @@ export default function CartPage() {
   if (error) {
     return (
       <AuthGuard>
-        <div className="max-w-5xl mx-auto px-4 py-12">
+        <div className="max-w-5xl mx-auto px-4 md:px-8 py-6 md:py-8">
           <div className="bg-surface-red border border-border-red rounded-xl p-4 text-text-on-red text-sm">
             <p className="font-semibold">Error al cargar el carrito</p>
             <p className="mt-1">{error}</p>
@@ -44,7 +44,7 @@ export default function CartPage() {
 
   return (
     <AuthGuard>
-      <div className="max-w-6xl mx-auto px-4 py-8 md:py-12 min-h-screen">
+      <div className="max-w-6xl mx-auto px-4 md:px-8 py-8 md:py-12 min-h-screen">
         <div className="flex items-center gap-3 mb-8">
           <ShoppingCart size={28} className="text-accent" />
           <h1 className="text-3xl md:text-4xl font-bold text-foreground">Carrito de Compras</h1>

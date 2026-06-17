@@ -1,11 +1,13 @@
 'use client';
 import { useMemo, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Product } from '@/models/product.model';
 import { formatPrice } from '@/utils/currency.util';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { useCart } from '@/hooks/useCart';
-import { Minus, Plus, ShoppingCart, XCircle, Trash2 } from 'lucide-react';
+import { useAuth } from '@/context/AuthContext';
+import { Minus, Plus, ShoppingCart, XCircle, Trash2, LogIn } from 'lucide-react';
 
 const MAX_PER_PRODUCT = 10;
 
@@ -14,7 +16,9 @@ interface ProductDetailProps {
 }
 
 export const ProductDetail = ({ product }: ProductDetailProps) => {
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
   const { addItem, removeItem, cart } = useCart();
+  const router = useRouter();
   const availableSizes = useMemo(
     () => product.sizes?.filter((size) => size.quantity > 0).map((size) => size.name) ?? [],
     [product.sizes],
@@ -51,6 +55,15 @@ export const ProductDetail = ({ product }: ProductDetailProps) => {
       await removeItem(cartItem.id);
     } finally {
       setRemoving(false);
+    }
+  };
+
+  const handleLoginRedirect = () => {
+    if (typeof window !== 'undefined') {
+      const currentPath = window.location.pathname;
+      router.push(`/login?redirect=${encodeURIComponent(currentPath)}`);
+    } else {
+      router.push('/login');
     }
   };
 
@@ -120,7 +133,22 @@ export const ProductDetail = ({ product }: ProductDetailProps) => {
           </span>
         </div>
 
-        {!isOutOfStock && availableSizes.length > 0 && (
+        {!authLoading && !isAuthenticated && (
+          <div className="pt-4 border-t border-border">
+            <Button
+              size="lg"
+              onClick={handleLoginRedirect}
+              className="w-full sm:w-auto"
+            >
+              <LogIn size={20} /> Inicia sesión para comprar
+            </Button>
+            <p className="mt-2 text-xs text-foreground-muted">
+              Necesitas una cuenta para añadir productos al carrito y completar tu pedido.
+            </p>
+          </div>
+        )}
+
+        {isAuthenticated && !isOutOfStock && availableSizes.length > 0 && (
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 pt-4 border-t border-border">
             <div className={`flex items-center rounded-xl border border-border bg-background-alt overflow-hidden ${isInCart ? 'opacity-50' : ''}`}>
               <button
@@ -158,7 +186,7 @@ export const ProductDetail = ({ product }: ProductDetailProps) => {
           </div>
         )}
 
-        {isOutOfStock && (
+        {isAuthenticated && isOutOfStock && (
           <div className="pt-4 border-t border-border">
             <Button size="lg" disabled className="w-full sm:w-auto opacity-50 cursor-not-allowed">
               <XCircle size={20} /> Producto Agotado

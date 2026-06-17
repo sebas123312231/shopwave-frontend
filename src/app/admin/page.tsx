@@ -11,6 +11,7 @@ import { AdminOrderService } from '@/services/admin-order.service';
 import { Product } from '@/models/product.model';
 import { Order } from '@/models/order.model';
 import { formatPrice } from '@/utils/currency.util';
+import { formatBoliviaShortDate } from '@/utils/datetime.util';
 
 interface DashboardStats {
   totalProducts: number;
@@ -55,11 +56,16 @@ export default function AdminPage() {
           (o) => o.orderStatus === 'PLACED' || o.orderStatus === 'PENDING'
         ).length;
 
-        const currentMonth = new Date().getMonth();
-        const currentYear = new Date().getFullYear();
+        const boliviaNow = new Date(
+          new Date().toLocaleString('en-US', { timeZone: 'America/La_Paz' }),
+        );
+        const currentMonth = boliviaNow.getMonth();
+        const currentYear = boliviaNow.getFullYear();
         const monthlyRevenue = orders
           .filter((o) => {
-            const orderDate = new Date(o.orderDate);
+            const orderDate = new Date(
+              new Date(o.orderDate).toLocaleString('en-US', { timeZone: 'America/La_Paz' }),
+            );
             return (
               o.orderStatus !== 'CANCELLED' &&
               orderDate.getMonth() === currentMonth &&
@@ -81,7 +87,7 @@ export default function AdminPage() {
           .map((o) => ({
             id: o.orderId || `#${o.id}`,
             status: o.orderStatus,
-            time: new Date(o.orderDate).toLocaleDateString('es-ES'),
+            time: formatBoliviaShortDate(o.orderDate),
           }));
         setRecentOrders(recent);
       } catch (err: unknown) {

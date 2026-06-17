@@ -22,7 +22,7 @@ export default function ProfilePage() {
 
   return (
     <AuthGuard>
-      <div className="max-w-4xl mx-auto px-4 py-8 md:py-12 min-h-screen">
+      <div className="max-w-4xl mx-auto px-4 md:px-8 py-8 md:py-12 min-h-screen">
 
         {loading && (
           <div className="flex min-h-[60vh] items-center justify-center">

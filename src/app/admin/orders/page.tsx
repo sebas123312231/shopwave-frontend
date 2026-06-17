@@ -11,6 +11,7 @@ import { AdminGuard } from '@/guards/AdminGuard';
 import { AdminOrderService } from '@/services/admin-order.service';
 import { Order, OrderStatus } from '@/models/order.model';
 import { formatPrice } from '@/utils/currency.util';
+import { formatBoliviaShortDate } from '@/utils/datetime.util';
 import Link from 'next/link';
 
 const statusOptions = [
@@ -124,7 +125,7 @@ export default function AdminOrdersPage() {
 
   return (
     <AdminGuard>
-      <div className="max-w-7xl mx-auto p-6 lg:p-8">
+      <div className="max-w-7xl mx-auto px-4 md:px-8 py-6 md:py-8">
         <div className="bg-background-alt border border-border rounded-2xl p-6 md:p-8 mb-8">
           <Link
             href="/admin"
@@ -196,7 +197,7 @@ export default function AdminOrdersPage() {
                       </td>
                       <td className="px-4 py-3 text-sm text-foreground-muted hidden md:table-cell">{order.user?.email || '-'}</td>
                       <td className="px-4 py-3 text-sm text-foreground-muted">
-                        {new Date(order.orderDate).toLocaleDateString('es-ES')}
+                        {formatBoliviaShortDate(order.orderDate)}
                       </td>
                       <td className="px-4 py-3">{getStatusBadge(order.orderStatus)}</td>
                       <td className="px-4 py-3 font-semibold text-foreground">{formatPrice(order.totalDiscountedPrice)}</td>

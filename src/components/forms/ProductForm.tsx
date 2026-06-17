@@ -97,6 +97,15 @@ export const ProductForm = ({
       newErrors.discountedPrice = 'El precio con descuento no puede ser mayor al precio regular';
     }
     if (formData.quantity < 0) newErrors.quantity = 'La cantidad no puede ser negativa';
+
+    const sizesTotal = formData.size.reduce((sum, size) => sum + (Number(size.quantity) || 0), 0);
+    if (formData.size.length === 0) {
+      newErrors.size = 'Debes definir al menos una talla antes de crear el producto';
+    } else if (sizesTotal !== formData.quantity) {
+      newErrors.size =
+        `Las tallas suman ${sizesTotal} unidades, pero el stock total es ${formData.quantity}. Deben coincidir.`;
+    }
+
     if (!formData.imageUrl.trim()) {
       newErrors.imageUrl = 'La URL de imagen es requerida';
     } else if (!isValidUrl(formData.imageUrl)) {
@@ -145,14 +154,17 @@ export const ProductForm = ({
   };
 
   const handleAddSize = () => {
-    if (newSize.name.trim() && newSize.quantity >= 0) {
-      setFormData((prev) => ({
-        ...prev,
-        size: [...prev.size, { name: newSize.name.trim(), quantity: newSize.quantity }],
-      }));
-      setNewSize({ name: '', quantity: 0 });
-    }
+    if (!newSize.name.trim()) return;
+    if (newSize.quantity < 0) return;
+    setFormData((prev) => ({
+      ...prev,
+      size: [...prev.size, { name: newSize.name.trim(), quantity: newSize.quantity }],
+    }));
+    setNewSize({ name: '', quantity: 0 });
   };
+
+  const sizesTotal = formData.size.reduce((sum, size) => sum + (Number(size.quantity) || 0), 0);
+  const sizesMatchStock = sizesTotal === formData.quantity;
 
   const handleRemoveSize = (index: number) => {
     setFormData((prev) => ({
@@ -276,7 +288,30 @@ export const ProductForm = ({
       </div>
 
       <div className="rounded-2xl bg-surface border border-border shadow-sm p-6 md:p-8 space-y-6">
-        <h2 className="text-lg font-bold text-foreground">Tallas</h2>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+          <div>
+            <h2 className="text-lg font-bold text-foreground">Tallas</h2>
+            <p className="text-xs text-foreground-muted mt-0.5">
+              La suma de unidades por talla debe coincidir con el stock total indicado arriba.
+            </p>
+          </div>
+          <div
+            className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-semibold border ${
+              sizesTotal === formData.quantity
+                ? 'bg-surface-green text-text-on-green border-border-green'
+                : 'bg-surface-amber text-text-on-amber border-border-amber'
+            }`}
+          >
+            <span>
+              Tallas: {sizesTotal} / Stock: {formData.quantity}
+            </span>
+            {sizesTotal === formData.quantity ? (
+              <span aria-hidden="true">✓</span>
+            ) : (
+              <span aria-hidden="true">!</span>
+            )}
+          </div>
+        </div>
 
         <div className="flex gap-3 items-end">
           <div className="flex-1">
@@ -301,6 +336,10 @@ export const ProductForm = ({
             Agregar
           </Button>
         </div>
+
+        {errors.size && (
+          <p className="text-xs text-error font-medium -mt-2">{errors.size}</p>
+        )}
 
         {formData.size.length > 0 && (
           <div className="space-y-2">
@@ -356,7 +395,12 @@ export const ProductForm = ({
         <Button variant="secondary" type="button" onClick={onCancel} className="flex-1" disabled={isLoading}>
           Cancelar
         </Button>
-        <Button type="submit" loading={isLoading} className="flex-1">
+        <Button
+          type="submit"
+          loading={isLoading}
+          className="flex-1"
+          disabled={isLoading || !sizesMatchStock || formData.size.length === 0}
+        >
           {mode === 'create' ? 'Crear Producto' : 'Actualizar Producto'}
         </Button>
       </div>

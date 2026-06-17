@@ -48,7 +48,9 @@ export function AuthScreen({ initialMode }: { initialMode?: 'login' | 'register'
 
     try {
       await AuthService.login(email, password);
-      window.location.href = '/';
+      const params = new URLSearchParams(window.location.search);
+      const redirect = params.get('redirect');
+      window.location.href = redirect && redirect.startsWith('/') ? redirect : '/';
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error al iniciar sesión');
       setIsLoading(false);

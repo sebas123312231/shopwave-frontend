@@ -48,7 +48,7 @@ export default function AdminOrderDetailPage() {
   if (error || !order) {
     return (
       <AdminGuard>
-        <div className="max-w-5xl mx-auto px-4 py-8">
+        <div className="max-w-5xl mx-auto px-4 md:px-8 py-6 md:py-8">
           <div className="bg-surface-red border border-border-red rounded-xl p-4 text-text-on-red text-sm flex items-start gap-3">
             <AlertCircle size={18} className="mt-0.5 flex-shrink-0" />
             <div>

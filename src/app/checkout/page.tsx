@@ -145,7 +145,7 @@ export default function CheckoutPage() {
   if (!orderCompleted && (!cart || cart.cartItems.length === 0)) {
     return (
       <AuthGuard>
-        <div className="max-w-3xl mx-auto px-4 py-12 text-center">
+        <div className="max-w-3xl mx-auto px-4 md:px-8 py-6 md:py-8 text-center">
           <div className="bg-surface rounded-2xl border-2 border-dashed border-border p-12">
             <ShoppingBag size={48} className="mx-auto text-foreground-muted mb-4" />
             <h2 className="text-xl font-bold text-foreground mb-2">Tu carrito está vacío</h2>
@@ -161,7 +161,7 @@ export default function CheckoutPage() {
 
   return (
     <AuthGuard>
-      <div className="max-w-4xl mx-auto px-4 py-8 md:py-12 min-h-screen">
+      <div className="max-w-4xl mx-auto px-4 md:px-8 py-8 md:py-12 min-h-screen">
         <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-2">Finalizar Compra</h1>
         <p className="text-foreground-muted mb-8">Completa los datos para confirmar tu orden</p>
 

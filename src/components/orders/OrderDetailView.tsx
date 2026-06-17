@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import { Order } from '@/models/order.model';
 import { OrderStatusBadge } from './OrderStatusBadge';
 import { ArrowLeft, Package, Truck } from 'lucide-react';
+import { formatBoliviaDateTime } from '@/utils/datetime.util';
 
 interface OrderDetailViewProps {
   order: Order;
@@ -17,18 +18,12 @@ const fmt = (price: number) =>
 export function OrderDetailView({ order, backPath, backLabel }: OrderDetailViewProps) {
   const router = useRouter();
 
-  const orderDate = new Date(order.orderDate).toLocaleDateString('es-BO', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  });
+  const orderDate = formatBoliviaDateTime(order.orderDate);
 
   const customerName = `${order.shippingAddress?.firstName || ''} ${order.shippingAddress?.lastName || ''}`.trim();
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-8 md:py-12 min-h-screen space-y-6">
+    <div className="max-w-5xl mx-auto px-4 md:px-8 py-8 md:py-12 min-h-screen space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-border pb-6">
         <div>
           <button
