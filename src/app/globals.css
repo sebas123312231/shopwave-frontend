@@ -89,6 +89,12 @@ html [class*="transition-"] {
   transition-property: all;
 }
 
+/* Transición suave del fondo/color de toda la app al cambiar de tema.
+   Va sin capa (unlayered) y después de la regla `html *` para tener prioridad sobre ella. */
+body {
+  transition: background-color 0.4s ease, color 0.4s ease;
+}
+
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
