@@ -8,7 +8,6 @@ interface AddressFormData {
   firstName: string;
   lastName: string;
   streetAddress: string;
-  city: string;
   state: string;
   zipCode: string;
   mobile: string;
@@ -72,17 +71,8 @@ export const AddressForm: React.FC<AddressFormProps> = ({ formData, onChange, er
             required
           />
         </div>
-        <Input
-          label="Ciudad"
-          name="city"
-          value={formData.city}
-          onChange={onChange}
-          error={errors.city}
-          autoComplete="address-level2"
-          required
-        />
         <Select
-          label="Departamento / Estado"
+          label="Departamento"
           name="state"
           value={formData.state}
           onChange={onChange}

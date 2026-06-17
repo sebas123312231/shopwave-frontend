@@ -14,10 +14,7 @@ import { AlertCircle, CheckCircle, MapPin, ShoppingBag } from 'lucide-react';
 const paymentMethodOptions: { value: string; label: string }[] = [
   { value: 'CREDIT_CARD', label: 'Tarjeta de Crédito' },
   { value: 'DEBIT_CARD', label: 'Tarjeta de Débito' },
-  { value: 'NET_BANKING', label: 'Transferencia Bancaria' },
-  { value: 'UPI', label: 'UPI' },
   { value: 'PAYPAL', label: 'PayPal' },
-  { value: 'GOOGLE_PAY', label: 'Google Pay' },
 ];
 
 export default function CheckoutPage() {
@@ -26,14 +23,12 @@ export default function CheckoutPage() {
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
-  const [createdOrderId, setCreatedOrderId] = useState<number | null>(null);
   const [orderCompleted, setOrderCompleted] = useState(false);
 
   const [addressData, setAddressData] = useState({
     firstName: '',
     lastName: '',
     streetAddress: '',
-    city: '',
     state: '',
     zipCode: '',
     mobile: '',
@@ -78,7 +73,6 @@ export default function CheckoutPage() {
     if (!addressData.firstName.trim()) errors.firstName = 'El nombre es obligatorio';
     if (!addressData.lastName.trim()) errors.lastName = 'El apellido es obligatorio';
     if (!addressData.streetAddress.trim()) errors.streetAddress = 'La dirección es obligatoria';
-    if (!addressData.city.trim()) errors.city = 'La ciudad es obligatoria';
     if (!addressData.state.trim()) errors.state = 'Selecciona un departamento';
     if (!addressData.zipCode.trim()) errors.zipCode = 'El código postal es obligatorio';
     if (!addressData.mobile.trim()) errors.mobile = 'El teléfono es obligatorio';
@@ -113,6 +107,7 @@ export default function CheckoutPage() {
     try {
       const payload: CreateOrderRequest = {
         ...addressData,
+        city: addressData.state,
         paymentMethod: checkoutData.paymentMethod,
         status: 'PENDING' as PaymentStatus,
         paymentId: `pay-${Date.now()}`,
@@ -120,8 +115,7 @@ export default function CheckoutPage() {
         cardNumber: checkoutData.cardNumber.replace(/\s/g, ''),
       };
 
-      const order = await OrderService.create(payload);
-      setCreatedOrderId(order.id);
+      await OrderService.create(payload);
       setStep(3);
       setOrderCompleted(true);
       refreshCart();
@@ -237,7 +231,7 @@ export default function CheckoutPage() {
           </div>
         )}
 
-        {step === 3 && createdOrderId && (
+        {step === 3 && (
           <div className="bg-surface border border-border rounded-2xl shadow-lg p-8 md:p-12 text-center animate-scaleIn">
             <div className="w-16 h-16 bg-surface-green rounded-full flex items-center justify-center mx-auto mb-4">
               <CheckCircle size={32} className="text-success" />
@@ -246,7 +240,7 @@ export default function CheckoutPage() {
               ¡Orden confirmada!
             </h2>
             <p className="text-foreground-muted mb-6">
-              Tu orden <span className="font-semibold text-foreground">#{createdOrderId}</span> ha sido registrada exitosamente.
+              Tu orden ha sido registrada.
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <Button variant="secondary" onClick={() => router.push('/products')}>
