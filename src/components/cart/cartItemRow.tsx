@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { CartItem } from '@/models/cart.model';
 import { useCart } from '@/hooks/useCart';
 import { Button } from '@/components/ui/Button';
@@ -18,7 +18,15 @@ export const CartItemRow: React.FC<CartItemRowProps> = ({ item }) => {
   const [updating, setUpdating] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
-  const maxQty = Math.min(MAX_PER_PRODUCT, item.product.quantity);
+  const sizeStock = useMemo(
+    () => item.product.sizes?.find((s) => s.name === item.size)?.quantity ?? 0,
+    [item.product.sizes, item.size],
+  );
+
+  const maxQty = useMemo(
+    () => Math.min(MAX_PER_PRODUCT, sizeStock),
+    [sizeStock],
+  );
 
   const handleQuantityChange = async (newQuantity: number) => {
     if (newQuantity < 1 || newQuantity > maxQty) return;
@@ -44,6 +52,8 @@ export const CartItemRow: React.FC<CartItemRowProps> = ({ item }) => {
     new Intl.NumberFormat('es-BO', { style: 'currency', currency: 'BOB' }).format(price);
 
   const unitDiscountedPrice = item.quantity > 0 ? item.discountedPrice / item.quantity : item.discountedPrice;
+  const atSizeLimit = item.quantity >= maxQty;
+  const sizeLowStock = sizeStock > 0 && sizeStock <= 5;
 
   return (
     <>
@@ -54,18 +64,31 @@ export const CartItemRow: React.FC<CartItemRowProps> = ({ item }) => {
           <div className="flex-1 min-w-0">
             <h3 className="font-semibold text-foreground truncate">{item.product.title}</h3>
             <p className="text-sm text-foreground-muted mt-0.5">Talla: {item.size}</p>
-            {item.product.quantity <= 5 && (
-              <p className="text-xs text-warning mt-0.5">Solo quedan {item.product.quantity}</p>
+            {sizeLowStock && (
+              <p className="text-xs text-warning mt-0.5">
+                Solo quedan {sizeStock} disponibles para esta talla
+              </p>
             )}
           </div>
         </div>
         <div className="flex items-center justify-center w-full sm:col-span-3">
           <div className="flex items-center border border-border rounded-xl bg-background-alt overflow-hidden">
-            <Button variant="ghost" size="sm" disabled={item.quantity <= 1 || updating}
-              onClick={() => handleQuantityChange(item.quantity - 1)}>-</Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              disabled={item.quantity <= 1 || updating}
+              onClick={() => handleQuantityChange(item.quantity - 1)}
+              aria-label="Disminuir cantidad"
+            >−</Button>
             <span className="px-3 py-1 font-medium text-sm min-w-[2.5rem] text-center">{item.quantity}</span>
-            <Button variant="ghost" size="sm" disabled={updating || item.quantity >= maxQty}
-              onClick={() => handleQuantityChange(item.quantity + 1)}>+</Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              disabled={updating || item.quantity >= maxQty}
+              onClick={() => handleQuantityChange(item.quantity + 1)}
+              aria-label="Aumentar cantidad"
+              title={atSizeLimit ? `Máximo ${maxQty} para talla ${item.size}` : undefined}
+            >+</Button>
           </div>
         </div>
         <div className="hidden sm:flex flex-col items-end sm:col-span-2">
