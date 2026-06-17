@@ -15,6 +15,14 @@ export interface ProductFilters {
   pageSize?: number;
 }
 
+export interface ProductFacets {
+  categories: string[];
+  colors: string[];
+  sizes: string[];
+  priceMin: number;
+  priceMax: number;
+}
+
 export const ProductService = {
   getProducts: async (page = 0, size = 8): Promise<Product[]> => {
     const products = await api.get<Product[]>('/products', false);
@@ -95,6 +103,46 @@ export const ProductService = {
 
   getProduct: async (id: number): Promise<Product> => {
     return api.get<Product>(`/products/${id}`, false);
+  },
+
+  getFacets: async (): Promise<ProductFacets> => {
+    const products = await api.get<Product[]>('/products', false);
+
+    const categories = new Set<string>();
+    const colors = new Set<string>();
+    const sizes = new Set<string>();
+    let priceMin = Infinity;
+    let priceMax = 0;
+
+    for (const product of products) {
+      if (product.category?.name) categories.add(product.category.name);
+      if (product.color) colors.add(product.color);
+      product.sizes?.forEach((size) => size.name && sizes.add(size.name));
+
+      const price = product.discountedPrice;
+      if (typeof price === 'number') {
+        if (price < priceMin) priceMin = price;
+        if (price > priceMax) priceMax = price;
+      }
+    }
+
+    const sizeOrder = ['XXS', 'XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL'];
+    const bySizeOrder = (a: string, b: string) => {
+      const ia = sizeOrder.indexOf(a.toUpperCase());
+      const ib = sizeOrder.indexOf(b.toUpperCase());
+      if (ia === -1 && ib === -1) return a.localeCompare(b);
+      if (ia === -1) return 1;
+      if (ib === -1) return -1;
+      return ia - ib;
+    };
+
+    return {
+      categories: [...categories].sort((a, b) => a.localeCompare(b)),
+      colors: [...colors].sort((a, b) => a.localeCompare(b)),
+      sizes: [...sizes].sort(bySizeOrder),
+      priceMin: Number.isFinite(priceMin) ? Math.floor(priceMin) : 0,
+      priceMax: priceMax > 0 ? Math.ceil(priceMax) : 1000,
+    };
   },
 
   searchProducts: async (query: string): Promise<Product[]> => {
