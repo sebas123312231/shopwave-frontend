@@ -1,13 +1,17 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { useParams } from 'next/navigation';
 import { AuthGuard } from '@/guards/AuthGuard';
 import { OrderService } from '@/services/order.service';
-import { Order } from '@/models/order.model';
+import { Order, OrderStatus } from '@/models/order.model';
 import { OrderDetailView } from '@/components/orders/OrderDetailView';
 import { Spinner } from '@/components/ui/Spinner';
 import { AlertCircle } from 'lucide-react';
+
+const POLL_INTERVAL_MS = 3000;
+
+const TERMINAL_STATUSES: OrderStatus[] = ['DELIVERED', 'CANCELLED'];
 
 export default function OrderDetailPage() {
   const params = useParams();
@@ -16,24 +20,96 @@ export default function OrderDetailPage() {
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const isMountedRef = useRef(true);
+
+  const fetchDetail = useCallback(
+    async (silent = false) => {
+      if (!orderId) return;
+      if (!silent) setLoading(true);
+      try {
+        const data = await OrderService.getById(orderId);
+        if (!isMountedRef.current) return;
+        setOrder(data);
+        setError(null);
+      } catch (err: unknown) {
+        if (!isMountedRef.current) return;
+        if (!silent) {
+          setError(err instanceof Error ? err.message : 'Error al cargar el detalle');
+        }
+      } finally {
+        if (isMountedRef.current && !silent) {
+          setLoading(false);
+        }
+      }
+    },
+    [orderId],
+  );
+
+  const isTerminal = useMemo(
+    () => !!order && TERMINAL_STATUSES.includes(order.orderStatus),
+    [order],
+  );
 
   useEffect(() => {
-    if (!orderId) return;
+    isMountedRef.current = true;
 
-    async function fetchDetail() {
+    const initialFetch = async () => {
       try {
-        setLoading(true);
         const data = await OrderService.getById(orderId);
+        if (!isMountedRef.current) return;
         setOrder(data);
+        setError(null);
       } catch (err: unknown) {
+        if (!isMountedRef.current) return;
         setError(err instanceof Error ? err.message : 'Error al cargar el detalle');
       } finally {
-        setLoading(false);
+        if (isMountedRef.current) setLoading(false);
       }
+    };
+    initialFetch();
+
+    if (isTerminal) {
+      return () => {
+        isMountedRef.current = false;
+      };
     }
 
-    fetchDetail();
-  }, [orderId]);
+    let interval: ReturnType<typeof setInterval> | null = null;
+
+    const start = () => {
+      if (interval) return;
+      interval = setInterval(() => {
+        if (!document.hidden) {
+          fetchDetail(true);
+        }
+      }, POLL_INTERVAL_MS);
+    };
+
+    const stop = () => {
+      if (interval) {
+        clearInterval(interval);
+        interval = null;
+      }
+    };
+
+    const onVisibility = () => {
+      if (document.hidden) {
+        stop();
+      } else {
+        start();
+        fetchDetail(true);
+      }
+    };
+
+    start();
+    document.addEventListener('visibilitychange', onVisibility);
+
+    return () => {
+      isMountedRef.current = false;
+      stop();
+      document.removeEventListener('visibilitychange', onVisibility);
+    };
+  }, [fetchDetail, isTerminal, orderId]);
 
   if (loading) {
     return (
