@@ -6,7 +6,7 @@ import { User } from '@/models/user.model';
 import { AuthGuard } from '@/guards/AuthGuard';
 import { Spinner } from '@/components/ui/Spinner';
 import { Badge } from '@/components/ui/Badge';
-import { User as UserIcon, Mail, Phone, Shield, MapPin } from 'lucide-react';
+import { User as UserIcon, Mail, Phone, Shield, MapPin, CreditCard } from 'lucide-react';
 
 export default function ProfilePage() {
   const [profile, setProfile] = useState<User | null>(null);
@@ -118,6 +118,41 @@ export default function ProfilePage() {
                       </div>
                     </div>
                   ))}
+                </div>
+              )}
+            </div>
+
+            {/* Sección 4: Tarjetas guardadas */}
+            <div className="bg-surface border border-border rounded-2xl p-6">
+              <h2 className="text-sm font-semibold text-foreground-muted uppercase tracking-wider mb-4">
+                Tarjetas Guardadas
+              </h2>
+
+              {!profile.paymentInformation || profile.paymentInformation.length === 0 ? (
+                <p className="text-sm text-foreground-muted">
+                  No tienes tarjetas guardadas todavía.
+                </p>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {profile.paymentInformation.map((payment, index) => {
+                    const last4 = (payment.cardNumber || '').replace(/\D/g, '').slice(-4) || '••••';
+                    return (
+                      <div key={`${payment.cardNumber}-${index}`} className="border border-border rounded-xl p-4 text-sm space-y-1">
+                        <div className="flex items-start gap-3">
+                          <CreditCard size={18} className="text-accent mt-0.5 flex-shrink-0" />
+                          <div>
+                            <p className="font-semibold text-foreground">{payment.cardholderName || 'Sin titular'}</p>
+                            <p className="text-foreground-muted">•••• •••• •••• {last4}</p>
+                            <p className="text-foreground-muted">
+                              {payment.paymentMethod === 'CREDIT_CARD' && 'Tarjeta de Crédito'}
+                              {payment.paymentMethod === 'DEBIT_CARD' && 'Tarjeta de Débito'}
+                              {payment.paymentMethod === 'PAYPAL' && 'PayPal'}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               )}
             </div>
