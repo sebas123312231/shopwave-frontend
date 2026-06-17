@@ -88,26 +88,27 @@ export default function AdminProductsPage() {
     <AdminGuard>
 
     <div className="max-w-7xl mx-auto px-4 md:px-8 py-6 md:py-8">
-
-      <Link
-        href="/admin"
-        className="inline-flex items-center gap-2 text-sm font-semibold text-accent hover:text-accent-dark transition-colors mb-6"
-      >
-        <ChevronLeft size={18} />
-        Volver al panel de administración
-      </Link>
-
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
-        <div>
-          <h1 className="text-3xl font-bold text-foreground tracking-tight">Gestión de Productos</h1>
-          <p className="mt-2 text-foreground-muted">Administra el catálogo de productos de tu tienda.</p>
-        </div>
-        <Link href="/admin/products/create">
-          <Button>
-            <Plus size={18} />
-            Nuevo Producto
-          </Button>
+      <div className="bg-background-alt border border-border rounded-2xl p-6 md:p-8 mb-8">
+        <Link
+          href="/admin"
+          className="inline-flex items-center gap-2 text-sm font-semibold text-accent hover:text-accent-dark transition-colors mb-6"
+        >
+          <ChevronLeft size={18} />
+          Volver al panel de administración
         </Link>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-bold text-foreground tracking-tight">Gestión de Productos</h1>
+            <p className="mt-2 text-foreground-muted">Administra el catálogo de productos de tu tienda.</p>
+          </div>
+          
+          <Link href="/admin/products/create">
+            <Button>
+              <Plus size={18} />
+              Nuevo Producto
+            </Button>
+          </Link>
+        </div>
       </div>
 
       {error && (

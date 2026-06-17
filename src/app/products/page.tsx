@@ -5,6 +5,7 @@ import { ProductList } from '@/components/products/ProductList';
 import { Button } from '@/components/ui/Button';
 import { useProducts } from '@/hooks/useProducts';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { Package } from 'lucide-react';
 
 export default function ProductsPage() {
   const {
@@ -31,7 +32,10 @@ export default function ProductsPage() {
   return (
     <div className="mx-auto px-2 md:px-8 py-6 md:py-8">
       <header className="mb-8">
-        <h1 className="text-3xl md:text-4xl font-bold text-foreground tracking-tight">Catálogo de productos</h1>
+        <div className="flex items-center gap-3">
+          <Package size={28} className="text-accent" />
+          <h1 className="text-3xl md:text-4xl font-bold text-foreground tracking-tight">Catálogo de productos</h1>
+        </div>
         <p className="mt-2 text-foreground-muted">Explora y filtra productos por categoría, precio, descuento y disponibilidad.</p>
       </header>
 

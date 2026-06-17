@@ -15,7 +15,6 @@ import {
   Menu,
   X,
   Store,
-  User,
 } from 'lucide-react';
 import { useState } from 'react';
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
@@ -26,6 +25,8 @@ interface NavItem {
   icon: React.ReactNode;
   requiresAuth?: boolean;
   requiresAdmin?: boolean;
+  category?: string;
+  badge?: React.ReactNode;
 }
 
 export const Sidebar = () => {
@@ -50,12 +51,11 @@ export const Sidebar = () => {
   };
 
   const allItems: NavItem[] = [
-    { label: 'Inicio', href: '/', icon: <Home size={20} /> },
-    { label: 'Productos', href: '/products', icon: <Package size={20} /> },
-    { label: 'Mis Órdenes', href: '/orders', icon: <ClipboardList size={20} />, requiresAuth: true },
-    { label: 'Carrito', href: '/cart', icon: <ShoppingCart size={20} />, requiresAuth: true },
-    { label: 'Perfil', href: '/profile', icon: <User size={20} />, requiresAuth: true },
-    { label: 'Administración', href: '/admin', icon: <Shield size={20} />, requiresAdmin: true },
+    { label: 'Inicio', href: '/', icon: <Home size={20} />, category: 'Tienda' },
+    { label: 'Productos', href: '/products', icon: <Package size={20} />, category: 'Tienda' },
+    { label: 'Carrito', href: '/cart', icon: <ShoppingCart size={20} />, requiresAuth: true, category: 'Mi Cuenta' },
+    { label: 'Mis Órdenes', href: '/orders', icon: <ClipboardList size={20} />, requiresAuth: true, category: 'Mi Cuenta' },
+    { label: 'Administración', href: '/admin', icon: <Shield size={20} />, requiresAdmin: true, category: 'Panel de Control' },
   ];
 
   const filteredItems = allItems.filter((item) => {
@@ -63,6 +63,8 @@ export const Sidebar = () => {
     if (item.requiresAdmin && !isAdmin) return false;
     return true;
   });
+
+  const categories = Array.from(new Set(filteredItems.map(item => item.category)));
 
   return (
     <>
@@ -116,40 +118,57 @@ export const Sidebar = () => {
           </div>
         </div>
 
-        <nav className="flex-1 overflow-y-auto p-4">
-          <ul className="space-y-1">
-            {filteredItems.map((item) => (
-              <li key={item.href}>
-                <Link
-                  href={item.href}
-                  onClick={() => setIsOpen(false)}
-                  className={`flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-all duration-200 ${
-                    isActive(item.href)
-                      ? 'bg-accent/15 text-accent-light border-l-4 border-accent'
-                      : 'text-white/60 hover:text-white hover:bg-white/5'
-                  }`}
-                >
-                  {item.icon}
-                  <span>{item.label}</span>
-                </Link>
-              </li>
-            ))}
-          </ul>
+        <nav className="flex-1 overflow-y-auto p-4 space-y-6">
+          {categories.map(category => (
+            <div key={category || 'general'}>
+              {category && (
+                <p className="mb-2 px-4 text-xs font-bold uppercase tracking-wider text-white/40">
+                  {category}
+                </p>
+              )}
+              <ul className="space-y-1">
+                {filteredItems.filter(item => item.category === category).map((item) => (
+                  <li key={item.href}>
+                    <Link
+                      href={item.href}
+                      onClick={() => setIsOpen(false)}
+                      className={`group flex items-center justify-between rounded-xl px-4 py-3 text-sm font-medium transition-all duration-200 ${
+                        isActive(item.href)
+                          ? 'bg-accent/15 text-accent-light border-l-4 border-accent'
+                          : 'text-white/60 hover:text-white hover:bg-white/5'
+                      }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        {item.icon}
+                        <span>{item.label}</span>
+                      </div>
+                      {item.badge && <div>{item.badge}</div>}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
         </nav>
 
         <div className="border-t border-white/10 p-4">
           {isAuthenticated ? (
             <div className="space-y-3">
-              <div className="flex items-center gap-3 rounded-xl bg-white/5 p-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-accent/20 text-accent-light text-sm font-bold">
+              <Link
+                href="/profile"
+                onClick={() => setIsOpen(false)}
+                className="flex items-center gap-3 rounded-xl bg-white/5 p-3 hover:bg-white/10 transition-colors"
+              >
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-accent/20 text-accent-light text-sm font-bold">
                   {getInitials(userEmail)}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="truncate text-sm font-medium text-white">
+                  <p className="truncate text-sm font-semibold text-white">
                     {userEmail || 'Usuario'}
                   </p>
+                  <p className="text-xs text-white/60 mt-0.5">Ver perfil</p>
                 </div>
-              </div>
+              </Link>
               <button
                 onClick={handleLogout}
                 className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-white/60 hover:text-white hover:bg-white/5 transition-colors"
