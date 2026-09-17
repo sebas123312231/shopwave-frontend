@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 1000" role="img" aria-labelledby="title desc">
+  <title id="title">ShopWave product placeholder</title>
+  <desc id="desc">Neutral placeholder shown when a product image is unavailable.</desc>
+  <rect width="800" height="1000" fill="#eee8ff"/>
+  <path d="M250 600c55-100 245-100 300 0v130H250z" fill="#6941c6" opacity=".2"/>
+  <circle cx="400" cy="390" r="120" fill="#6941c6" opacity=".25"/>
+  <path d="M315 400h170M350 460h100" stroke="#4c249e" stroke-width="18" stroke-linecap="round" opacity=".7"/>
+  <text x="400" y="830" fill="#4c249e" font-family="system-ui,sans-serif" font-size="44" font-weight="700" text-anchor="middle">ShopWave</text>
+</svg>
