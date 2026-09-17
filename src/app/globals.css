@@ -1,249 +1,61 @@
 @import "tailwindcss";
 
 @theme {
-  --color-primary: #0f172a;
-  --color-primary-light: #1e293b;
-  --color-primary-dark: #020617;
-  --color-accent: #9d4edd;
-  --color-accent-light: #c77dff;
-  --color-accent-dark: #7b2cbf;
-  --color-background: #f8fafc;
-  --color-background-alt: #f1f5f9;
-  --color-surface: #ffffff;
-  --color-surface-hover: #f8fafc;
-  --color-foreground: #0f172a;
-  --color-foreground-muted: #64748b;
-  --color-border: #e2e8f0;
-  --color-success: #22c55e;
-  --color-warning: #f59e0b;
-  --color-error: #ef4444;
-  --color-surface-blue: #f3e8ff;
-  --color-surface-red: #fef2f2;
-  --color-surface-green: #f0fdf4;
-  --color-text-on-red: #b91c1c;
-  --color-text-on-green: #15803d;
-  --color-text-on-blue: #7b2cbf;
-  --color-surface-amber: #fffbeb;
-  --color-text-on-amber: #92400e;
-  --color-border-amber: #fde68a;
-  --color-surface-purple: #faf5ff;
-  --color-text-on-purple: #6b21a8;
-  --color-border-purple: #e9d5ff;
-  --color-border-red: #fecaca;
-  --color-border-green: #bbf7d0;
-  --color-border-blue: #e0aaff;
-
-  --animate-fadeIn: fadeIn 0.3s ease-out forwards;
-  --animate-slideUp: slideUp 0.4s ease-out forwards;
-  --animate-slideInLeft: slideInLeft 0.3s ease-out forwards;
-  --animate-slideInRight: slideInRight 0.3s ease-out forwards;
-  --animate-scaleIn: scaleIn 0.3s ease-out forwards;
+  --color-page: #f8f7fb;
+  --color-panel: #ffffff;
+  --color-ink: #1c1730;
+  --color-muted: #716c80;
+  --color-line: #e7e2ef;
+  --color-brand: #6941c6;
+  --color-brand-strong: #4c249e;
+  --color-brand-soft: #eee8ff;
+  --color-danger: #b42318;
+  --color-danger-soft: #fef3f2;
+  --color-success: #087443;
+  --color-success-soft: #ecfdf3;
+  --color-warning: #9a6700;
+  --color-warning-soft: #fff8e1;
 }
 
-/* ─── Dark Mode: variable overrides ─── */
 .dark {
-  --color-primary: #0f172a;
-  --color-primary-light: #1e293b;
-  --color-primary-dark: #020617;
-  --color-accent: #c77dff;
-  --color-accent-light: #e0aaff;
-  --color-accent-dark: #9d4edd;
-  --color-background: #0f172a;
-  --color-background-alt: #1e293b;
-  --color-surface: #1e293b;
-  --color-surface-hover: #334155;
-  --color-foreground: #f1f5f9;
-  --color-foreground-muted: #94a3b8;
-  --color-border: #334155;
-  --color-success: #4ade80;
-  --color-warning: #fbbf24;
-  --color-error: #f87171;
-  --color-surface-blue: #3a1f5e;
-  --color-surface-red: #3b1c1c;
-  --color-surface-green: #1a3a2a;
-  --color-text-on-red: #fca5a5;
-  --color-text-on-green: #86efac;
-  --color-text-on-blue: #e0aaff;
-  --color-surface-amber: #3b2f10;
-  --color-text-on-amber: #fcd34d;
-  --color-border-amber: #5c4813;
-  --color-surface-purple: #2e1a47;
-  --color-text-on-purple: #d8b4fe;
-  --color-border-purple: #4a2570;
-  --color-border-red: #5c2020;
-  --color-border-green: #2d5a3d;
-  --color-border-blue: #4a2570;
-}
-
-/* Smooth transition when switching themes */
-html,
-html *,
-html *::before,
-html *::after {
-  transition: background-color 0.3s ease, border-color 0.3s ease, color 0.15s ease, box-shadow 0.3s ease;
-}
-
-/* Disable theme transition for animations to prevent conflicts */
-html [class*="animate-"],
-html [class*="transition-"] {
-  transition-property: all;
-}
-
-/* Transición suave del fondo/color de toda la app al cambiar de tema.
-   Va sin capa (unlayered) y después de la regla `html *` para tener prioridad sobre ella. */
-body {
-  transition: background-color 0.4s ease, color 0.4s ease;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-@keyframes slideUp {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes slideInLeft {
-  from { opacity: 0; transform: translateX(-20px); }
-  to { opacity: 1; transform: translateX(0); }
-}
-
-@keyframes slideInRight {
-  from { opacity: 0; transform: translateX(20px); }
-  to { opacity: 1; transform: translateX(0); }
-}
-
-@keyframes scaleIn {
-  from { opacity: 0; transform: scale(0.95); }
-  to { opacity: 1; transform: scale(1); }
-}
-
-/* ─── Carrusel infinito (marquee dual) de productos destacados ─── */
-@keyframes marquee-left {
-  from { transform: translateX(0); }
-  to { transform: translateX(-50%); }
-}
-
-@keyframes marquee-right {
-  from { transform: translateX(-50%); }
-  to { transform: translateX(0); }
-}
-
-.marquee {
-  position: relative;
-  overflow: hidden;
-  /* Difuminado suave en los bordes laterales */
-  -webkit-mask-image: linear-gradient(to right, transparent, #000 5%, #000 95%, transparent);
-  mask-image: linear-gradient(to right, transparent, #000 5%, #000 95%, transparent);
-}
-
-.marquee-track {
-  display: flex;
-  flex-wrap: nowrap;
-  width: max-content;
-  will-change: transform;
-}
-
-.marquee-track--left {
-  animation: marquee-left var(--marquee-duration, 45s) linear infinite;
-}
-
-.marquee-track--right {
-  animation: marquee-right var(--marquee-duration, 45s) linear infinite;
-}
-
-/* Pausa la pista al pasar el cursor para facilitar el clic, sin bloquear la interacción */
-.marquee-track:hover {
-  animation-play-state: paused;
-}
-
-/* Respeta la preferencia de movimiento reducido del sistema */
-@media (prefers-reduced-motion: reduce) {
-  .marquee-track {
-    animation: none;
-    transform: none;
-  }
-  .marquee {
-    overflow-x: auto;
-  }
+  --color-page: #12101a;
+  --color-panel: #1c1927;
+  --color-ink: #f6f2ff;
+  --color-muted: #b8b0c9;
+  --color-line: #393344;
+  --color-brand: #b298ff;
+  --color-brand-strong: #d5c8ff;
+  --color-brand-soft: #30274a;
+  --color-danger: #ff8a80;
+  --color-danger-soft: #3a2024;
+  --color-success: #6ce9a6;
+  --color-success-soft: #17372b;
+  --color-warning: #f4c45f;
+  --color-warning-soft: #3b3019;
 }
 
 @layer base {
-  body {
-    background: var(--color-background);
-    color: var(--color-foreground);
-    font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
-  }
+  * { border-color: var(--color-line); }
+  html { color-scheme: light; }
+  html.dark { color-scheme: dark; }
+  body { background: var(--color-page); color: var(--color-ink); font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+  a { color: inherit; text-decoration: none; }
+  button, input, select, textarea { font: inherit; }
+  button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 3px solid color-mix(in srgb, var(--color-brand) 45%, transparent); outline-offset: 2px; }
+}
 
-  a {
-    color: var(--color-accent);
-  }
+@layer components {
+  .button { @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition; }
+  .button-primary { @apply bg-brand text-white shadow-sm hover:bg-brand-strong disabled:cursor-not-allowed disabled:opacity-50; }
+  .button-secondary { @apply border border-line bg-panel text-ink hover:bg-brand-soft; }
+  .button-danger { @apply bg-danger-soft text-danger hover:brightness-95; }
+  .icon-button { @apply relative inline-grid size-10 place-items-center rounded-xl text-muted transition hover:bg-panel hover:text-ink; }
+  .badge-dot { @apply absolute -right-0.5 -top-0.5 grid min-w-5 place-items-center rounded-full bg-brand px-1 text-[11px] font-bold text-white; }
+  .field { @apply mt-1.5 block w-full rounded-xl border border-line bg-page px-3.5 py-3 text-sm text-ink placeholder:text-muted/70; }
+  .card { @apply rounded-2xl border border-line bg-panel shadow-[0_10px_40px_rgba(46,24,88,0.05)]; }
+  .eyebrow { @apply text-xs font-bold uppercase tracking-[0.18em] text-brand; }
+}
 
-  a:hover {
-    color: var(--color-accent-dark);
-  }
-
-  input:-webkit-autofill,
-  input:-webkit-autofill:hover,
-  input:-webkit-autofill:focus,
-  select:-webkit-autofill,
-  select:-webkit-autofill:hover,
-  select:-webkit-autofill:focus,
-  textarea:-webkit-autofill,
-  textarea:-webkit-autofill:hover,
-  textarea:-webkit-autofill:focus {
-    -webkit-text-fill-color: var(--color-foreground);
-    -webkit-box-shadow: 0 0 0px 1000px var(--color-background-alt) inset;
-    transition: background-color 5000s ease-in-out 0s;
-  }
-
-  /* ─── Dual range slider (price filter) ─── */
-  input[type="range"].dual-range {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    margin: 0;
-    background: transparent;
-    pointer-events: none;
-    -webkit-appearance: none;
-    appearance: none;
-  }
-
-  input[type="range"].dual-range::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    appearance: none;
-    pointer-events: auto;
-    height: 18px;
-    width: 18px;
-    border-radius: 9999px;
-    background: var(--color-surface);
-    border: 2px solid var(--color-accent);
-    box-shadow: 0 1px 4px rgba(15, 23, 42, 0.25);
-    cursor: pointer;
-    transition: transform 0.15s ease, box-shadow 0.15s ease;
-  }
-
-  input[type="range"].dual-range::-webkit-slider-thumb:hover {
-    transform: scale(1.15);
-    box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-accent) 18%, transparent);
-  }
-
-  input[type="range"].dual-range::-moz-range-thumb {
-    pointer-events: auto;
-    height: 18px;
-    width: 18px;
-    border-radius: 9999px;
-    background: var(--color-surface);
-    border: 2px solid var(--color-accent);
-    box-shadow: 0 1px 4px rgba(15, 23, 42, 0.25);
-    cursor: pointer;
-  }
-
-  input[type="range"].dual-range:focus-visible::-webkit-slider-thumb {
-    box-shadow: 0 0 0 4px var(--color-accent);
-  }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
 }
