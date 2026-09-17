@@ -1,133 +1,26 @@
-"use client";
+import type { Metadata } from 'next';
+import Link from 'next/link';
+import { ArrowLeft, ArrowRight } from 'lucide-react';
+import { getCatalog, getFacets, type CatalogQuery } from '@/lib/server/catalog';
+import { CatalogControls } from '@/components/products/CatalogControls';
+import { ProductGrid } from '@/components/products/ProductGrid';
 
-import { useEffect, useState } from 'react';
-import { ProductFilter } from '@/components/products/ProductFilter';
-import { ProductList } from '@/components/products/ProductList';
-import { Button } from '@/components/ui/Button';
-import { useProducts } from '@/hooks/useProducts';
-import { ProductFacets, ProductService } from '@/services/product.service';
-import { ChevronLeft, ChevronRight, Package, Search, X } from 'lucide-react';
+export const dynamic = 'force-dynamic';
+export const metadata: Metadata = { title: 'Catálogo' };
 
-const emptyFacets: ProductFacets = {
-  categories: [],
-  colors: [],
-  sizes: [],
-  priceMin: 0,
-  priceMax: 1000,
-};
+type SearchParams = Promise<Record<string, string | string[] | undefined>>;
 
-export default function ProductsPage() {
-  const {
-    productsPage,
-    filters,
-    searchTerm,
-    isSearchActive,
-    loading,
-    error,
-    setSearchTerm,
-    updateFilters,
-    changePage,
-    resetFilters,
-  } = useProducts({
-    initialFilters: {
-      pageNumber: 0,
-      pageSize: 12,
-    },
-  });
+function toCatalogQuery(value: Record<string, string | string[] | undefined>): CatalogQuery {
+  const one = (key: string) => typeof value[key] === 'string' ? value[key] : undefined;
+  const many = (key: string) => Array.isArray(value[key]) ? value[key] : typeof value[key] === 'string' ? [value[key]] : undefined;
+  return { q: one('q'), categoryId: one('categoryId'), color: many('color'), variantLabel: many('variantLabel'), minPriceMinor: one('minPriceMinor'), maxPriceMinor: one('maxPriceMinor'), inStock: one('inStock'), sort: one('sort'), page: one('page'), size: one('size') };
+}
 
-  const [facets, setFacets] = useState<ProductFacets>(emptyFacets);
-
-  useEffect(() => {
-    let active = true;
-    ProductService.getFacets()
-      .then((result) => {
-        if (active) setFacets(result);
-      })
-      .catch(() => {
-        /* keep fallback facets on error */
-      });
-    return () => {
-      active = false;
-    };
-  }, []);
-
-  const currentPage = productsPage?.number ?? 0;
-  const totalPages = productsPage?.totalPages ?? 1;
-
-  return (
-    <div className="mx-auto px-2 md:px-8 py-6 md:py-8">
-      <header className="mb-6">
-        <div className="flex items-center gap-3">
-          <Package size={28} className="text-accent" />
-          <h1 className="text-3xl md:text-4xl font-bold text-foreground tracking-tight">Catálogo de productos</h1>
-        </div>
-        <p className="mt-2 text-foreground-muted">Explora y filtra productos por categoría, precio, descuento y disponibilidad.</p>
-      </header>
-
-      {/* Toolbar: search (always visible) + filter trigger */}
-      <div className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-center">
-        <div className="relative flex-1">
-          <Search size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-foreground-muted" />
-          <input
-            type="text"
-            placeholder="Buscar productos..."
-            value={searchTerm}
-            onChange={(event) => setSearchTerm(event.target.value)}
-            className="w-full rounded-xl border border-border bg-surface pl-11 pr-9 py-2.5 text-sm text-foreground shadow-sm outline-none transition focus:border-accent focus:ring-2 focus:ring-accent/20 placeholder:text-foreground-muted"
-          />
-          {searchTerm && (
-            <button
-              onClick={() => setSearchTerm('')}
-              aria-label="Limpiar búsqueda"
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-foreground-muted transition hover:text-foreground"
-            >
-              <X size={16} />
-            </button>
-          )}
-        </div>
-
-        <ProductFilter
-          filters={filters}
-          facets={facets}
-          isSearchActive={isSearchActive}
-          onFiltersChange={updateFilters}
-          onReset={resetFilters}
-        />
-      </div>
-
-      <section className="space-y-6">
-        <ProductList products={productsPage?.content ?? []} loading={loading} error={error} />
-
-        {productsPage && totalPages > 1 && (
-          <div className="flex items-center justify-between rounded-2xl bg-surface border border-border px-5 py-4 shadow-sm">
-            <p className="text-sm text-foreground-muted">
-              Página <span className="font-semibold text-foreground">{currentPage + 1}</span> de{' '}
-              <span className="font-semibold text-foreground">{totalPages}</span>
-            </p>
-
-            <div className="flex gap-2">
-              <Button
-                variant="secondary"
-                size="sm"
-                disabled={loading || currentPage <= 0}
-                onClick={() => changePage(Math.max(0, currentPage - 1))}
-              >
-                <ChevronLeft size={16} />
-                Anterior
-              </Button>
-              <Button
-                variant="secondary"
-                size="sm"
-                disabled={loading || currentPage >= totalPages - 1}
-                onClick={() => changePage(Math.min(totalPages - 1, currentPage + 1))}
-              >
-                Siguiente
-                <ChevronRight size={16} />
-              </Button>
-            </div>
-          </div>
-        )}
-      </section>
-    </div>
-  );
+export default async function ProductsPage({ searchParams }: { searchParams: SearchParams }) {
+  const raw = await searchParams;
+  const query = toCatalogQuery(raw);
+  const [catalog, facets] = await Promise.all([getCatalog(query), getFacets()]);
+  const currentPage = catalog?.page ?? Number(query.page ?? 0);
+  const makePageUrl = (page: number) => { const params = new URLSearchParams(); Object.entries(raw).forEach(([key, value]) => { if (Array.isArray(value)) value.forEach((item) => params.append(key, item)); else if (value) params.set(key, value); }); params.set('page', String(page)); return `/products?${params.toString()}`; };
+  return <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8"><div className="mb-10 max-w-2xl"><p className="eyebrow">Catálogo</p><h1 className="mt-3 text-4xl font-semibold tracking-tight sm:text-5xl">Encuentra algo que se sienta tuyo.</h1><p className="mt-4 text-lg leading-8 text-muted">Explora productos con filtros que respetan lo que estás buscando.</p></div><CatalogControls key={JSON.stringify(raw)} initial={raw} facets={facets} />{!catalog && <div className="mb-6 rounded-2xl border border-warning/30 bg-warning-soft px-4 py-3 text-sm text-warning" role="status">El catálogo no está disponible en este momento. Verifica que el backend local esté activo.</div>}{!facets && <div className="mb-6 rounded-2xl border border-line bg-panel px-4 py-3 text-sm text-muted" role="status">Los filtros avanzados no están disponibles; puedes usar la búsqueda y el ordenamiento.</div>}<ProductGrid products={catalog?.items ?? []} /><div className="mt-8 flex items-center justify-between text-sm text-muted"><span>{catalog ? `${catalog.totalItems} productos` : 'Sin conexión'}</span><div className="flex gap-2">{currentPage > 0 && <Link href={makePageUrl(currentPage - 1)} className="button button-secondary"><ArrowLeft size={16} />Anterior</Link>}{catalog && currentPage + 1 < catalog.totalPages && <Link href={makePageUrl(currentPage + 1)} className="button button-secondary">Siguiente<ArrowRight size={16} /></Link>}</div></div></div>;
 }
