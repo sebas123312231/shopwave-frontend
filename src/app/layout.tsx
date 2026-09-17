@@ -1,46 +1,13 @@
 import type { Metadata } from 'next';
-import { Geist, Geist_Mono } from 'next/font/google';
-import Script from 'next/script';
 import './globals.css';
-import { AuthProvider } from '@/context/AuthContext';
-import { CartProvider } from '@/context/CartContext';
-import { ThemeProvider } from '@/context/ThemeContext';
-import { Sidebar } from '@/components/layout/Sidebar';
-
-const geistSans = Geist({ variable: '--font-geist-sans', subsets: ['latin'] });
-const geistMono = Geist_Mono({ variable: '--font-geist-mono', subsets: ['latin'] });
+import { Providers } from '@/components/Providers';
+import { StoreShell } from '@/components/layout/StoreShell';
 
 export const metadata: Metadata = {
-  title: 'ShopWave Fusion',
-  description: 'E-commerce moderno con Next.js',
+  title: { default: 'ShopWave · Compra con intención', template: '%s · ShopWave' },
+  description: 'Catálogo e-commerce demo con stock por variante y pago simulado.',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
-  return (
-    <html lang="es" suppressHydrationWarning>
-      <head>
-        <Script
-          id="theme-init"
-          strategy="beforeInteractive"
-          dangerouslySetInnerHTML={{
-            __html: `(function(){try{var t=localStorage.getItem("shopwave-theme");if(t==="dark"){document.documentElement.classList.add("dark")}}catch(e){}})();`,
-          }}
-        />
-      </head>
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <ThemeProvider>
-          <AuthProvider>
-            <CartProvider>
-              <div className="flex min-h-screen bg-background">
-                <Sidebar />
-                <main className="flex-1 min-w-0 overflow-x-hidden pt-14 md:pt-0 md:ml-64">
-                  {children}
-                </main>
-              </div>
-            </CartProvider>
-          </AuthProvider>
-        </ThemeProvider>
-      </body>
-    </html>
-  );
+  return <html lang="es" suppressHydrationWarning><body><Providers><StoreShell>{children}</StoreShell></Providers></body></html>;
 }
