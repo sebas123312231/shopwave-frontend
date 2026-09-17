@@ -1,277 +1,79 @@
-# ShopWave Fusion - Frontend
+# ShopWave frontend
 
-> E-commerce universitario construido con Next.js 16, React 19, TypeScript y Tailwind CSS v4.
+Frontend e-commerce de portfolio construido con Next.js App Router, React, TypeScript y Tailwind CSS. La versión actual es un rework coordinado con el backend Spring Boot de [`shopwave-entorno`](../shopwave-entorno).
 
----
+## Stack y decisiones
 
-## Contexto del Proyecto
+- Next.js 16.2.6, React 19.2.4 y TypeScript estricto.
+- Tailwind CSS 4 con tokens de tema claro/oscuro.
+- Server Components para home, catálogo y detalle; Client Components para interacción.
+- BFF de Next.js bajo `/api`: el navegador mantiene una cookie HttpOnly y nunca recibe el JWT del backend.
+- Zod valida requests/responses en el borde; TanStack Query gestiona carrito, perfil, órdenes y admin.
+- Checkout `MOCK/SIMULATED`: no se solicitan ni almacenan tarjetas, PAN o CVV.
+- URLs del catálogo son la fuente de verdad para búsqueda, filtros, orden y paginación.
 
-**ShopWave Fusion** es una plataforma de e-commerce diseñada para entornos universitarios. El frontend está construido con **Next.js 16.2.6 (App Router)** usando **React 19.2.4**, **TypeScript** en modo estricto, **Tailwind CSS v4** y **Turbopack** como bundler. El backend es un servicio Spring Boot que corre en Docker.
+## Requisitos
 
-### Stack Tecnológico
+- Node.js compatible con Next.js 16.
+- npm.
+- Backend ShopWave v1 accesible, normalmente en `http://localhost:8080`.
 
-| Tecnología | Versión | Uso |
-|------------|---------|-----|
-| Next.js | 16.2.6 | Framework React con App Router |
-| React | 19.2.4 | Librería UI |
-| TypeScript | 5.x | Tipado estático (strict mode) |
-| Tailwind CSS | v4 | Estilos con variables CSS custom |
-| Turbopack | - | Bundler rápido para desarrollo |
-| JWT | - | Autenticación via token |
+## Configuración
 
-### Autenticación
-
-El sistema usa **JWT** para autenticación. El flujo es:
-
-1. **Registro** (`POST /auth/signup`): Crea usuario con rol `ROLE_USER`
-2. **Login** (`GET /auth/signin` con Basic Auth): Devuelve JWT en header `Authorization` (sin prefijo `Bearer`)
-3. **Requests protegidas**: Enviar JWT en header `Authorization` sin prefijo
-
-### Endpoints Principales
-
-- `POST /auth/signup` - Registro de usuarios
-- `GET /auth/signin` - Login con Basic Auth
-- `GET /products` - Listar productos (público)
-- `GET /cart/` - Carrito (requiere JWT)
-- `POST /orders/` - Crear orden (requiere JWT)
-- `POST /admin/products/` - Crear producto (requiere `ROLE_ADMIN`)
-
----
-
-## Instalación
-
-### Prerrequisitos
-
-- **Node.js** 18.x o superior
-- **npm** 9.x o superior
-- **Docker** (para el backend)
-- **Docker Compose** (para levantar el backend)
-
-### Paso 1: Clonar el repositorio
-
-```bash
-git clone <url-del-repositorio>
-cd shopwave-frontend
+```powershell
+Copy-Item .env.example .env.local
 ```
 
-### Paso 2: Instalar dependencias
-
-```bash
-npm install
-```
-
-Esto instalará todas las dependencias del proyecto listadas en `package.json`.
-
-### Paso 3: Variables de entorno
-
-Para desarrollo local, puedes usar un archivo `.env.local` con la configuración básica:
+Edita `.env.local` sólo localmente:
 
 ```env
-NEXT_PUBLIC_API_URL=http://localhost:8080
 BACKEND_URL=http://localhost:8080
+APP_ORIGIN=http://localhost:3000
 ```
 
-> **Nota:** El token JWT nunca debe ir en variables de entorno. Se maneja directamente en el código via `localStorage`.
+`BACKEND_URL` es server-only y `APP_ORIGIN` se usa para las comprobaciones de origen del BFF. No añadas tokens ni secretos a variables `NEXT_PUBLIC_*`.
 
-### Deploy en Netlify
+## Desarrollo y verificación
 
-El frontend está preparado para Netlify y apunta por defecto al backend publicado en Render:
-
-```env
-BACKEND_URL=https://shopwave-backend-1-j1l2.onrender.com
-```
-
-Si prefieres controlar el destino desde Netlify, define la variable `BACKEND_URL` en el panel del sitio con ese mismo valor.
-
-### Paso 4: Levantar el backend (Docker)
-
-El backend debe estar corriendo para que el frontend funcione correctamente.
-
-```bash
-# Ir al directorio del backend (suponiendo que está en un repo separado)
-cd ../shopwave-backend
-
-# Levantar todos los servicios con Docker Compose
-docker-compose up -d
-
-# Verificar que el contenedor está corriendo
-docker ps
-```
-
-El backend estará disponible en `http://localhost:8080`.
-
-### Paso 5: Ejecutar el servidor de desarrollo
-
-```bash
+```powershell
+npm install
 npm run dev
+
+npm run lint
+npm run typecheck
+npm test
+npm run test:coverage
+npm run build
+npm run test:e2e
 ```
 
-El frontend estará disponible en [http://localhost:3000](http://localhost:3000).
+Las pruebas unitarias no requieren backend. Las suites Playwright full-stack se habilitan con un backend y una base demo aislada; si ese entorno no está disponible, el resultado debe documentarse como no verificado.
 
----
+## Rutas principales
 
-## Scripts Disponibles
+| Ruta | Propósito |
+|---|---|
+| `/` | Home y productos destacados |
+| `/products` | Catálogo paginado con búsqueda, filtros y orden |
+| `/products/[id]` | Detalle y selección de variante |
+| `/login`, `/register` | Autenticación |
+| `/cart`, `/checkout` | Carrito y checkout simulado |
+| `/orders`, `/orders/[id]` | Historial y detalle propio |
+| `/profile` | Perfil y direcciones guardadas |
+| `/admin` | Resumen y operaciones protegidas por rol |
 
-| Comando | Descripción |
-|---------|-------------|
-| `npm run dev` | Inicia el servidor de desarrollo con Turbopack |
-| `npm run build` | Genera build de producción |
-| `npm run start` | Inicia el servidor de producción |
-| `npm run lint` | Ejecuta ESLint |
+## Estructura relevante
 
----
-
-## Docker - Backend
-
-### Levantar el backend
-
-```bash
-# Desde el directorio del backend
-docker-compose up -d
+```text
+src/app/                  rutas, layouts y boundaries
+src/app/api/              BFF de autenticación y store
+src/components/           UI pública, compra, cuenta y admin
+src/context/              sesión, tema y fachada de carrito
+src/contracts/            schemas Zod y tipos inferidos
+src/lib/client/           transporte browser y errores
+src/lib/server/           backend fetch, sesión y allowlist BFF
 ```
 
-### Ver logs del contenedor
+## Evidencia del rework
 
-```bash
-docker-compose logs -f
-```
-
-### Detener el contenedor
-
-```bash
-docker-compose down
-```
-
-### Reconstruir imagen
-
-```bash
-docker-compose build --no-cache
-```
-
-### Verificar que el backend está respondiendo
-
-```bash
-curl http://localhost:8080/products?page=0&size=1
-```
-
----
-
-## Estructura del Proyecto
-
-```
-shopwave-frontend/
-├── src/
-│   ├── app/                    # Rutas (App Router)
-│   │   ├── login/              # Página de login
-│   │   ├── register/           # Página de registro
-│   │   ├── products/          # Catálogo de productos
-│   │   ├── cart/              # Carrito de compras
-│   │   ├── orders/            # Órdenes del usuario
-│   │   ├── profile/           # Perfil del usuario
-│   │   └── admin/             # Panel de administración
-│   ├── components/            # Componentes reutilizables
-│   │   ├── layout/           # Navbar, Footer, etc.
-│   │   └── ui/               # Componentes atómicos
-│   ├── models/               # Interfaces TypeScript
-│   ├── types/                # Tipos genéricos
-│   ├── services/             # Llamadas a la API
-│   ├── hooks/                # Custom hooks de React
-│   ├── context/              # React Context (Auth)
-│   ├── guards/               # Guardianes de rutas
-│   └── utils/               # Utilidades (token, currency, validation)
-├── .env.local                # Variables de entorno locales
-├── .vscode/                  # Configuración del IDE
-└── package.json
-```
-
----
-
-## Uso de IA en el Proyecto
-
-Si necesitas usar inteligencia artificial (ChatGPT, Copilot, Claude, etc.) para ayudarte con el desarrollo:
-
-1. **Código base**: Comparte el archivo `01_Base_Compartida_y_Estrategia.md` para dar contexto completo del proyecto
-2. **Stack**: Next.js 16 App Router, React 19, TypeScript strict, Tailwind CSS v4
-3. **Backend**: Spring Boot en Java, corriendo en Docker en `localhost:8080`
-4. **Autenticación**: JWT sin prefijo Bearer, guardado en `localStorage` con key `shopwave_token`
-5. **Modelos**: Están en `src/models/` - usa estos tipos en lugar de inventar nuevos
-6. **API Service**: No modificar `src/services/api.service.ts` sin consenso del equipo - es el archivo sagrado
-7. **Estilos**: Usar variables CSS (`var(--color-*)`) definidas en `globals.css`, no colores hardcodeados
-
----
-
-## Reglas del Equipo
-
-1. **Archivos sagrados** (no modificar sin consenso):
-   - `src/services/api.service.ts`
-   - `src/context/AuthContext.tsx`
-   - `src/app/layout.tsx`
-   - `src/utils/token.util.ts`
-   - `tsconfig.json`
-   - `.env.local`
-
-2. **Convención de commits**:
-   ```
-   feat: agregar nueva funcionalidad
-   fix: corregir bug
-   refactor: reestructurar código
-   docs: actualizar documentación
-   ```
-
-3. **Tipado**: TypeScript en modo estricto - `any` prohibido sin justificación documentada.
-
----
-
-## Pruebas con Postman
-
-El archivo `ShopWave.postman_collection.json` en la raíz del proyecto contiene la colección completa de endpoints para probar la API con Postman.
-
-### Pasos para importar y usar
-
-1. Abrir Postman y hacer clic en **Import**
-2. Seleccionar el archivo `ShopWave.postman_collection.json`
-3. En la colección importada, ir a **Variables** y verificar que `base_url` apunte a `http://localhost:8080`
-4. Ejecutar primero **Auth → Inicio de sesión (Login)** — el script de test guarda el JWT automáticamente en la variable `{{jwt_token}}`
-5. El resto de los requests protegidos usarán `{{jwt_token}}` automáticamente
-
-### Endpoints incluidos
-
-| Módulo | Método | Endpoint | Auth |
-|--------|--------|----------|------|
-| Auth | POST | `/auth/signup` | No |
-| Auth | GET | `/auth/signin` | Basic |
-| Productos | GET | `/products` | No |
-| Productos | GET | `/products/all` | No |
-| Productos | GET | `/products/:id` | No |
-| Productos | GET | `/products/products/search` | No |
-| Reseñas | GET | `/reviews/product/:id` | No |
-| Reseñas | POST | `/reviews/create` | JWT |
-| Calificaciones | GET | `/ratings/product/:id` | No |
-| Calificaciones | POST | `/ratings/create` | JWT |
-| Carrito | GET | `/cart` | JWT |
-| Carrito | PUT | `/cart/add` | JWT |
-| Órdenes | POST | `/orders` | JWT |
-| Órdenes | GET | `/orders/user` | JWT |
-| Órdenes | GET | `/orders/:id` | JWT |
-| Usuarios | GET | `/users/profile` | JWT |
-| Admin | POST | `/admin/products/` | JWT (Admin) |
-
----
-
-## Troubleshooting
-
-### Error "Cannot read properties of undefined (reading 'map')"
-
-Asegúrate de que el backend esté corriendo y que los endpoints返回 la estructura esperada.
-
-### Error de CORS
-
-Verificar que el backend tenga configurados los headers CORS correctamente.
-
-### Errores de tipado
-
-Ejecutar `npm run build` para ver errores TypeScript.
-
----
-
-**Tech Lead:** Mayo 2026
+Las decisiones, comandos comprobados y limitaciones se registran en [`docs/REWORK_EVIDENCE.md`](docs/REWORK_EVIDENCE.md). No se declara una demo publicada, una puntuación Lighthouse ni una verificación MySQL si no existe evidencia reproducible.
