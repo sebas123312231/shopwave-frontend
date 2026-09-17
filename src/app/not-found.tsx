@@ -1,0 +1,2 @@
+import Link from 'next/link';
+export default function NotFound() { return <div className="mx-auto max-w-xl px-4 py-24 text-center"><p className="eyebrow">404</p><h1 className="mt-3 text-3xl font-semibold">No encontramos esa página</h1><p className="mt-3 text-muted">Puede que el producto ya no esté disponible o que el enlace haya cambiado.</p><Link href="/products" className="button button-primary mt-7">Volver al catálogo</Link></div>; }
