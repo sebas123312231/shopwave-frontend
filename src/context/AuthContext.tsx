@@ -1,130 +1,66 @@
 'use client';
 
-import React, { createContext, useContext, useEffect, useState, useCallback, useRef } from 'react';
-import { getToken, removeToken, decodeToken, isTokenExpired } from '@/utils/token.util';
-import { JwtPayload } from '@/models/auth.model';
-import { Role } from '@/types/role.type';
+import { createContext, useContext, useEffect, useMemo } from 'react';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { apiFetch } from '@/lib/client/api';
+import type { LoginInput, RegisterInput, Session, User } from '@/contracts/shopwave.schema';
 
-interface AuthContextType {
-  isAuthenticated: boolean;
-  isAdmin: boolean;
-  userEmail: string | null;
-  role: Role | null;
+type AuthContextValue = {
+  user: User | null;
+  session: Session | null;
   isLoading: boolean;
-  logout: () => void;
-  refreshAuth: () => boolean;
-}
-
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
-
-export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [authState, setAuthState] = useState<{
-    isAuthenticated: boolean;
-    isAdmin: boolean;
-    userEmail: string | null;
-    role: Role | null;
-    isLoading: boolean;
-  }>({
-    isAuthenticated: false,
-    isAdmin: false,
-    userEmail: null,
-    role: null,
-    isLoading: true,
-  });
-
-  const mountedRef = useRef(false);
-
-  const refreshAuth = useCallback((): boolean => {
-    const token = getToken();
-    if (token) {
-      if (isTokenExpired(token)) {
-        removeToken();
-        setAuthState({
-          isAuthenticated: false,
-          isAdmin: false,
-          userEmail: null,
-          role: null,
-          isLoading: false,
-        });
-        return false;
-      }
-      try {
-        const decoded = decodeToken(token) as unknown as JwtPayload;
-        const authorities = decoded.authorities || '';
-        const isAdmin = authorities.includes('ROLE_ADMIN');
-        const role: Role = isAdmin ? 'ADMIN' : 'USER';
-        setAuthState({
-          isAuthenticated: true,
-          isAdmin,
-          userEmail: decoded.username,
-          role,
-          isLoading: false,
-        });
-        return true;
-      } catch {
-        removeToken();
-        setAuthState({
-          isAuthenticated: false,
-          isAdmin: false,
-          userEmail: null,
-          role: null,
-          isLoading: false,
-        });
-        return false;
-      }
-    } else {
-      setAuthState({
-        isAuthenticated: false,
-        isAdmin: false,
-        userEmail: null,
-        role: null,
-        isLoading: false,
-      });
-      return false;
-    }
-  }, []);
-
-  const logout = useCallback(() => {
-    removeToken();
-    setAuthState({
-      isAuthenticated: false,
-      isAdmin: false,
-      userEmail: null,
-      role: null,
-      isLoading: false,
-    });
-  }, []);
-
-  useEffect(() => {
-    if (!mountedRef.current) {
-      mountedRef.current = true;
-      refreshAuth();
-    }
-  }, [refreshAuth]);
-
-  useEffect(() => {
-    const handleUnauthorized = () => {
-      const token = getToken();
-      if (!token || isTokenExpired(token)) {
-        logout();
-      }
-    };
-
-    window.addEventListener('auth:unauthorized', handleUnauthorized);
-    return () => {
-      window.removeEventListener('auth:unauthorized', handleUnauthorized);
-    };
-  }, [logout]);
-
-  return (
-    <AuthContext.Provider value={{ ...authState, logout, refreshAuth }}>
-      {children}
-    </AuthContext.Provider>
-  );
+  login: (input: LoginInput) => Promise<Session>;
+  register: (input: RegisterInput) => Promise<User>;
+  logout: () => Promise<void>;
 };
 
-export const useAuth = (): AuthContextType => {
+const AuthContext = createContext<AuthContextValue | null>(null);
+
+export function AuthProvider({ children }: { children: React.ReactNode }) {
+  const queryClient = useQueryClient();
+  const sessionQuery = useQuery<Session | null>({
+    queryKey: ['session'],
+    queryFn: async () => {
+      try { return await apiFetch<Session>('/api/session'); } catch { return null; }
+    },
+    retry: false,
+    staleTime: 30_000,
+  });
+  const loginMutation = useMutation({
+    mutationFn: (input: LoginInput) => apiFetch<Session>('/api/auth/login', { method: 'POST', body: JSON.stringify(input) }),
+    onSuccess: (session) => queryClient.setQueryData(['session'], session),
+  });
+  const registerMutation = useMutation({
+    mutationFn: (input: RegisterInput) => apiFetch<User>('/api/auth/register', { method: 'POST', body: JSON.stringify(input) }),
+  });
+  const logoutMutation = useMutation({
+    mutationFn: () => apiFetch<void>('/api/auth/logout', { method: 'POST', body: '{}' }),
+    onSettled: () => {
+      queryClient.setQueryData(['session'], null);
+      void queryClient.cancelQueries();
+      queryClient.removeQueries({ predicate: (query) => query.queryKey[0] !== 'session' });
+    },
+  });
+
+  useEffect(() => {
+    const refresh = () => { void sessionQuery.refetch(); };
+    window.addEventListener('shopwave:auth-expired', refresh);
+    return () => window.removeEventListener('shopwave:auth-expired', refresh);
+  }, [sessionQuery]);
+
+  const value = useMemo<AuthContextValue>(() => ({
+    user: sessionQuery.data?.user ?? null,
+    session: sessionQuery.data ?? null,
+    isLoading: sessionQuery.isLoading,
+    login: (input) => loginMutation.mutateAsync(input),
+    register: (input) => registerMutation.mutateAsync(input),
+    logout: async () => { await logoutMutation.mutateAsync(); },
+  }), [loginMutation, logoutMutation, registerMutation, sessionQuery.data, sessionQuery.isLoading]);
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+}
+
+export function useAuth() {
   const context = useContext(AuthContext);
   if (!context) throw new Error('useAuth debe usarse dentro de AuthProvider');
   return context;
-};
+}
