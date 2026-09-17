@@ -1,0 +1,21 @@
+'use client';
+
+import Link from 'next/link';
+import { ArrowLeft, Check, Minus, Plus, ShieldCheck } from 'lucide-react';
+import { useState } from 'react';
+import type { Product } from '@/contracts/shopwave.schema';
+import { formatPrice } from '@/lib/format';
+import { useCart } from '@/context/CartContext';
+import { getErrorMessage } from '@/lib/client/api';
+import { ProductImage } from './ProductImage';
+
+export function ProductDetailClient({ product }: { product: Product }) {
+  const available = product.variants.filter((variant) => variant.active && variant.stock > 0);
+  const [variantId, setVariantId] = useState(available[0]?.id ?? '');
+  const [quantity, setQuantity] = useState(1);
+  const [message, setMessage] = useState<string | null>(null);
+  const { addItem, isMutating } = useCart();
+  const variant = product.variants.find((item) => item.id === variantId);
+  const add = async () => { try { await addItem(variantId, quantity); setMessage('Producto agregado al carrito.'); } catch (error) { setMessage(getErrorMessage(error, 'No se pudo agregar el producto')); } };
+  return <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8"><Link href="/products" className="inline-flex items-center gap-2 text-sm font-semibold text-muted hover:text-brand"><ArrowLeft size={16} />Volver al catálogo</Link><div className="mt-8 grid gap-10 lg:grid-cols-2 lg:gap-16"><div className="relative aspect-[4/5] overflow-hidden rounded-[2rem] bg-brand-soft"><ProductImage src={product.imageUrl} alt={product.title} sizes="(max-width: 1024px) 100vw, 50vw" /></div><div className="flex flex-col justify-center"><p className="eyebrow">{product.brand} · {product.category.name}</p><h1 className="mt-4 text-4xl font-semibold tracking-tight sm:text-5xl">{product.title}</h1><div className="mt-5 flex items-center gap-3"><span className="text-2xl font-bold">{formatPrice(product.salePriceMinor)}</span><span className="text-muted line-through">{formatPrice(product.priceMinor)}</span><span className="rounded-full bg-success-soft px-2.5 py-1 text-xs font-bold text-success">Ahorras {Math.round(product.discountPercent)}%</span></div><p className="mt-6 leading-8 text-muted">{product.description}</p><fieldset className="mt-8 border-t border-line pt-6"><legend className="text-sm font-semibold">Elige una variante</legend><div className="mt-3 flex flex-wrap gap-2">{product.variants.map((item) => <button type="button" key={item.id} disabled={!item.active || item.stock < 1} aria-pressed={variantId === item.id} onClick={() => { setVariantId(item.id); setMessage(null); }} className={`min-h-11 rounded-xl border px-4 text-sm font-semibold transition ${variantId === item.id ? 'border-brand bg-brand-soft text-brand-strong' : 'border-line bg-panel hover:border-brand'} disabled:cursor-not-allowed disabled:opacity-40`}>{item.label}</button>)}</div>{variant && <p className="mt-2 text-sm text-muted">{variant.stock} disponibles</p>}</fieldset><div className="mt-6 flex flex-col gap-3 sm:flex-row"><div className="flex h-11 items-center rounded-xl border border-line"><button type="button" aria-label="Disminuir cantidad" className="grid size-11 place-items-center text-muted hover:text-ink" onClick={() => setQuantity((value) => Math.max(1, value - 1))}><Minus size={16} /></button><span className="w-8 text-center text-sm font-semibold" aria-live="polite">{quantity}</span><button type="button" aria-label="Aumentar cantidad" className="grid size-11 place-items-center text-muted hover:text-ink" onClick={() => setQuantity((value) => Math.min(10, Math.min(variant?.stock ?? 10, value + 1)))}><Plus size={16} /></button></div><button type="button" disabled={!variant || isMutating} onClick={add} className="button button-primary flex-1">{message?.startsWith('Producto') ? <Check size={17} /> : null}{message?.startsWith('Producto') ? 'Agregado' : 'Agregar al carrito'}</button></div>{message && <p className={`mt-3 text-sm ${message.startsWith('Producto') ? 'text-success' : 'text-danger'}`} role="status">{message}</p>}<div className="mt-8 flex items-start gap-3 rounded-2xl bg-panel p-4 text-sm text-muted"><ShieldCheck size={19} className="mt-0.5 shrink-0 text-brand" /><span>Checkout protegido por una operación simulada. Nunca ingreses datos reales de tarjeta en este demo.</span></div></div></div></div>;
+}
